@@ -1,0 +1,12 @@
+name: AdvancedWhiteList
+version: 1.1.12
+api-version: 1.13
+author: Shadorunce
+prefix: AdvancedWhiteList
+main: com.gmail.shadoruncegaming.advancedwhitelist.AdvancedWhiteList
+website: https://www.spigotmc.org/resources/advancedwhitelist-lite.78612/
+description: Advanced but easy Whitelisting, now with Permission options and cooldown from server start time!
+commands:
+   advancedwhitelist:
+         usage: /<command>
+         aliases: [advancedwhitelist,advancedwl,awhitelist,advwl,awl,easywhitelist,easywl,ewhitelist,ewl,ezwl,whitelist,wl,wlist]
