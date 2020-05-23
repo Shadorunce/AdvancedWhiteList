@@ -20,7 +20,7 @@ public class WLCmd implements CommandExecutor {
     }
 
 	public boolean onCommand(CommandSender snd, Command pluginCommand, String chatCommand, String[] strings) {	
-		if (!snd.hasPermission("advancedwhitelist.admin") || !snd.hasPermission("easywhitelist.admin")) {
+		if (!snd.hasPermission("advancedwhitelist.admin") && !snd.hasPermission("easywhitelist.admin")) {
 			Utility.sendMsg(snd, prefix);
 			return true;
 		} if (strings.length == 0) {
@@ -128,6 +128,17 @@ public class WLCmd implements CommandExecutor {
 	
 				Utility.sendMsg(snd, "&a&lWhitelisted: &7" + names);
 				return;
+				
+			case "resetlist":
+			case "reset":
+			case "listreset":
+			case "clearlist":
+			case "listclear":
+			case "removeall":
+			case "rall":
+				for (String n : this.m.getStorage().getWhiteLists()) {
+					this.m.getStorage().removeWhitelist(n);
+				}
 			
 			case "whitelist":
 			case "wl":
@@ -579,6 +590,7 @@ public class WLCmd implements CommandExecutor {
 				Bukkit.shutdown();
 				
 				return;
+				
 		}
 	}
 	
@@ -640,6 +652,7 @@ public class WLCmd implements CommandExecutor {
 		}
 	}
 	
+	
 	String msgOnly(String[] args) {
 		String msg = "";
 		int i;
@@ -694,12 +707,10 @@ public class WLCmd implements CommandExecutor {
 		if (args.length < 2 || args[1].equals("1")) {
 			Utility.sendMsg(snd, "&e> &7/awl &bstatus/info");
 			Utility.sendMsg(snd, "&e> &7/awl &bmessages - ");
-			Utility.sendMsg(snd, "&e> &7/awl &aadd &f<name>");
-			Utility.sendMsg(snd, "&e> &7/awl &cremove &f<name>");
+			Utility.sendMsg(snd, "&e> &7/awl &aadd/remove &f<name>");
 			Utility.sendMsg(snd, "&e> &7/awl &flist");
+			Utility.sendMsg(snd, "&e> &7/awl &cclearlist");
 			Utility.sendMsg(snd, "&e> &7/awl &a&lon &f/ &coff");
-			Utility.sendMsg(snd, "&e> &7/awl &bscdon&7/&8scdoff &e- Server start to player login cooldown");
-			Utility.sendMsg(snd, "&e> &7/awl &bscdtime <seconds>");
 			Utility.sendMsg(snd, "&e> &7/awl &cwlonly/send/kick &e- Kicks players that aren't whitelisted.");
 			Utility.sendMsg(snd, "&e> &7/awl &creload");
 			Utility.sendMsg(snd, "&e> &7/awl &crestart &e- Kicks everyone except Operators and restarts the server.");
@@ -707,6 +718,8 @@ public class WLCmd implements CommandExecutor {
 		}
 		
 		if (args[1].equals("2")) {
+			Utility.sendMsg(snd, "&e> &7/awl &bscdon&7/&8scdoff &e- Server start to player login cooldown");
+			Utility.sendMsg(snd, "&e> &7/awl &bscdtime <seconds>");
 			Utility.sendMsg(snd, "&e> &7/awl &bnotwlmsg <message> &e- Msg sent to the player if they aren't whitelisted for a server.");
 			Utility.sendMsg(snd, "&e> &7/awl &bbcastmsg <message> &e- Msg sent before everyone gets kicked from send/kick command.");
 			Utility.sendMsg(snd, "&e> &7/awl &bsendmsg <message> &e- Msg sent to the player just before they're sent back to Hub/Lobby.");
@@ -743,7 +756,7 @@ public class WLCmd implements CommandExecutor {
 		}
 
 		if (args[1].equals("5")) {
-			Utility.sendMsg(snd, "&e> advancedwhitelist, advancedwl, awhitelist, advwl, awl, easywhitelist, easywl, ewhitelist, ewl, ezwl, whitelist, wl, wlist");
+			Utility.sendMsg(snd, "&e> advancedwhitelist, advancedwl, awhitelist, advwl, awl, whitelist, wl, wlist");
 			Utility.sendMsg(snd, "&e> status, s, info, inf, in, i");
 			Utility.sendMsg(snd, "&e> messages, message, msgs, msg");
 			Utility.sendMsg(snd, "&e> help, h, ?");
@@ -751,9 +764,9 @@ public class WLCmd implements CommandExecutor {
 			Utility.sendMsg(snd, "&e> remove, rem, re, r");
 			Utility.sendMsg(snd, "&e> add, ad, a");
 			Utility.sendMsg(snd, "&e> list, li, l");
+			Utility.sendMsg(snd, "&e> resetlist, reset, listreset, clearlist, listclear, removeall, rall");
 			return;
 		}
-
 		if (args[1].equals("6")) {
 			Utility.sendMsg(snd, "&e> whitelist, wl");
 			Utility.sendMsg(snd, "&e> whiteliston, wlon, on");
