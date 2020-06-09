@@ -1,8 +1,6 @@
 package com.gmail.shadoruncegaming.advancedwhitelist;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -62,10 +60,10 @@ public class WLGui implements Listener {
         inv.setItem(6,createGuiItem(getGUIMat(Storage.isOtherAccess()), "§eOther Access Enabled", "§eEnabled: " + getTFColor(Storage.isOtherAccess()), tfClick));
         inv.setItem(7,createGuiItem(getGUIMat(Storage.isServerCooldown()), "§eServer Cooldown Enabled", "§eEnabled: " + getTFColor(Storage.isServerCooldown()), tfClick));
         // Messages
-        inv.setItem(9,createGuiItem(Material.MAGENTA_STAINED_GLASS_PANE, "§eNot Whitelisted Message", "§eMessage: " + msgSplit(Storage.getNotWhitelistMsg()), msgClick));
-        inv.setItem(10,createGuiItem(Material.YELLOW_STAINED_GLASS_PANE, "§eBroadcast Message before sending players", "§eMessage: " + msgSplit(Storage.getBroadcastMsg()), msgClick));
-        inv.setItem(11,createGuiItem(Material.WHITE_STAINED_GLASS_PANE, "§eMessage sent before sending player", "§eMessage: " + msgSplit(Storage.getSendMsg()), msgClick));
-        inv.setItem(12,createGuiItem(Material.PINK_STAINED_GLASS_PANE, "§eMessage sent if player gets kicked", "§eMessage: " + Storage.getKickMsg(), msgClick));
+        inv.setItem(9,createGuiItem(Material.MAGENTA_STAINED_GLASS_PANE, "§eNot Whitelisted Message", "§eMessage: " + Storage.getNotWhitelistMsg().substring(0, 50), msgClick));
+        inv.setItem(10,createGuiItem(Material.YELLOW_STAINED_GLASS_PANE, "§eBroadcast Message before sending players", "§eMessage: " + Storage.getBroadcastMsg().substring(0, 50), msgClick));
+        inv.setItem(11,createGuiItem(Material.WHITE_STAINED_GLASS_PANE, "§eMessage sent before sending player", "§eMessage: " + Storage.getSendMsg().substring(0, 50), msgClick));
+        inv.setItem(12,createGuiItem(Material.PINK_STAINED_GLASS_PANE, "§eMessage sent if player gets kicked", "§eMessage: " + Storage.getKickMsg().substring(0, 50), msgClick));
         inv.setItem(13,createGuiItem(Material.ORANGE_STAINED_GLASS_PANE, "§eHub/Lobby server", "§eServer: §6" + Storage.getHubServer(), msgClick, "Refer to Bungee server settings to find Hub/Lobby name."));
         // Durations
         inv.setItem(18,createGuiItem(Material.BLUE_STAINED_GLASS_PANE, "§eServer Cooldown Duration", "§eDuration: §b" + Storage.getServerCooldown(), intClick1, intClick2, intClick3));
@@ -84,29 +82,19 @@ public class WLGui implements Listener {
 		if (!trueFalse) TF = "§cFalse";
 		return TF;
 	}
-	
-	// Trying to make multiple lines if too long.
-	public static List<String> msgSplit(String... lore) {
-		if (lore.length <= 7) return Arrays.asList(lore);
-		String lores = Arrays.asList(lore).toString();
-		int size = 7;
-	    List<String> ret = new ArrayList<String>((lores.length() + size - 1) / size);
-
-	    for (int start = 0; start < lores.length(); start += size) {
-	        ret.add(lores.substring(start, Math.min(lores.length(), start + size)));
-	    }
-	    return ret;
-	}
 
     // Nice little method to create a gui item with a custom name, and description
     protected static ItemStack createGuiItem(final Material material, final String name, final String... lore)
     {
         final ItemStack item = new ItemStack(material, 1);
         final ItemMeta meta = item.getItemMeta();
-
+        
         // Set the name of the item
         meta.setDisplayName(name);
-        Utility.broadcast(Arrays.asList(lore).toString());
+        
+        // Can undo the comment below to see the lores that are processed.
+        //Utility.broadcast(Arrays.asList(lore).toString());
+        
         // Set the lore of the item
         meta.setLore(Arrays.asList(lore));
 
