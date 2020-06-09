@@ -29,11 +29,12 @@ public class WLGui implements Listener {
 	static String intClick3 = "§6Middle click material to type amount.";
 	static String msgClick = "§6Left Click material to type a new text.";
 	static String msgClick2 = "§6Right Click material to view the full message in chat.";
+	static String title = ChatColor.GOLD + "Advanced" + ChatColor.GREEN + "WhiteList";
 	
     // You can call this whenever you want to put the items in
     public static void initializeItems()
     {
-		inv = Bukkit.createInventory(null, 27, ChatColor.GOLD + "Advanced" + ChatColor.GREEN + "WhiteList");
+		inv = Bukkit.createInventory(null, 27, WLGui.title);
     	
     	WLStorage.reload();
         
@@ -54,10 +55,21 @@ public class WLGui implements Listener {
         inv.setItem(6,createGuiItem(getGUIMat(WLStorage.isOtherAccess()), "§eOther Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isOtherAccess()), tfClick));
         inv.setItem(7,createGuiItem(getGUIMat(WLStorage.isServerCooldown()), "§eServer Cooldown Enabled", "§eEnabled: " + getTFColor(WLStorage.isServerCooldown()), tfClick));
         // Messages
-        inv.setItem(9,createGuiItem(Material.MAGENTA_STAINED_GLASS_PANE, "§eNot Whitelisted Message", "§eMessage: " + WLStorage.getNotWhitelistMsg().substring(0, 50) + "[...]", msgClick, msgClick2));
-        inv.setItem(10,createGuiItem(Material.YELLOW_STAINED_GLASS_PANE, "§eBroadcast Message before sending players", "§eMessage: " + WLStorage.getBroadcastMsg().substring(0, 50) + "[...]", msgClick, msgClick2));
-        inv.setItem(11,createGuiItem(Material.WHITE_STAINED_GLASS_PANE, "§eMessage sent before sending player", "§eMessage: " + WLStorage.getSendMsg().substring(0, 50) + "[...]", msgClick, msgClick2));
-        inv.setItem(12,createGuiItem(Material.PINK_STAINED_GLASS_PANE, "§eMessage sent if player gets kicked", "§eMessage: " + WLStorage.getKickMsg().substring(0, 50) + "[...]", msgClick, msgClick2));
+        int maxSize = 50;
+        String string;
+        Utility.broadcast(numToString(WLStorage.getBroadcastMsg().length()));
+        string = WLStorage.getNotWhitelistMsg();
+        if (WLStorage.getNotWhitelistMsg().length() > maxSize) string = WLStorage.getNotWhitelistMsg().substring(0, maxSize);
+        inv.setItem(9,createGuiItem(Material.MAGENTA_STAINED_GLASS_PANE, "§eNot Whitelisted Message", "§eMessage: " + string, msgClick, msgClick2));
+        string = WLStorage.getBroadcastMsg();
+        if (WLStorage.getNotWhitelistMsg().length() > maxSize) string = WLStorage.getBroadcastMsg().substring(0, maxSize);
+        inv.setItem(10,createGuiItem(Material.YELLOW_STAINED_GLASS_PANE, "§eBroadcast Message before sending players", "§eMessage: " + string, msgClick, msgClick2));
+        string = WLStorage.getSendMsg();
+        if (WLStorage.getNotWhitelistMsg().length() > maxSize) string = WLStorage.getSendMsg().substring(0, maxSize);
+        inv.setItem(11,createGuiItem(Material.WHITE_STAINED_GLASS_PANE, "§eMessage sent before sending player", "§eMessage: " + string, msgClick, msgClick2));
+        string = WLStorage.getKickMsg();
+        if (WLStorage.getNotWhitelistMsg().length() > maxSize) string = WLStorage.getKickMsg().substring(0, maxSize);
+        inv.setItem(12,createGuiItem(Material.PINK_STAINED_GLASS_PANE, "§eMessage sent if player gets kicked", "§eMessage: " + string, msgClick, msgClick2));
         inv.setItem(13,createGuiItem(Material.ORANGE_STAINED_GLASS_PANE, "§eMessage sent if player gets kicked", "§eServer: §6" + WLStorage.getHubServer(), msgClick, "Refer to Bungee server settings to find Hub/Lobby name."));
         // Durations
         inv.setItem(18,createGuiItem(Material.BLUE_STAINED_GLASS_PANE, "§eServer Cooldown Duration", "§eDuration: §b" + WLStorage.getServerCooldown(), intClick1, intClick2, intClick3));
@@ -66,6 +78,10 @@ public class WLGui implements Listener {
         
     }
 
+    
+    
+    
+    
 	public static Material getGUIMat(Boolean trueFalse) {
 		if (trueFalse) return Material.GREEN_STAINED_GLASS_PANE;
 		else return Material.RED_STAINED_GLASS_PANE;
@@ -114,7 +130,7 @@ public class WLGui implements Listener {
     {
         Player p = (Player) e.getWhoClicked();
 		e.setCancelled(true);
-    	if (ChatColor.translateAlternateColorCodes('&', e.getView().getTitle()).equals(ChatColor.GOLD + "AdvancedWhiteList")) {
+    	if (ChatColor.translateAlternateColorCodes('&', e.getView().getTitle()).equals(WLGui.title)) {
     		if (e.getCurrentItem() != null) {
     			String name = e.getCurrentItem().getItemMeta().getDisplayName();
     			// Boolean
@@ -247,6 +263,12 @@ public class WLGui implements Listener {
     
     public String numToString(Long in) {
     	return in.toString();
+    }
+    
+    public static String numToString(int in) {
+    	Long l = (long) in;
+    	String s = l.toString();
+    	return s;
     }
     
  // Cancel dragging in our inventory
