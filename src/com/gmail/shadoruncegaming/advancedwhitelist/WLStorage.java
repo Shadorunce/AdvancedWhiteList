@@ -8,22 +8,22 @@ public class WLStorage {
 	private AdvancedWhiteList m;
 	private String configVersion;
 	private ArrayList<String> whitelists = new ArrayList<String>();
-	private boolean WhitelistEnabled = false;
-	private boolean ProjectTeamAccessEnabled = false;
-	private boolean StaffAccessEnabled = false;
-	private boolean TesterAccessEnabled = false;
-	private boolean AlternateAccessEnabled = false;
-	private boolean OtherAccessEnabled = false;
-	private boolean ConfigAccessEnabled = false;
-	private boolean ServerCooldownEnabled = true;
-	private long ServerCooldownDuration = 60; // In seconds based on from start of plugin.
-	private long delayBeforeStartingKicks = 4; // In seconds.
-	private long kickDelayPerPlayer = 1; // In seconds.
-	private String hubServer = "lobby";
-	private String notwhitelistmsg = "&eSorry, the server is currently in Whitelist mode, please enjoy one of our other servers. :)";
-	private String broadcastmsg = "&eSorry, the server is currently in Whitelist mode, please enjoy one of our other servers. :)";
-	private String sendmsg = "&eSorry, the server is currently in Whitelist mode, please enjoy one of our other servers. :)";
-	private String kickmsg = "&eSorry, the server is currently in Whitelist mode, please enjoy one of our other servers. :)";
+	public boolean WhitelistEnabled = false;
+	public boolean ProjectTeamAccessEnabled = false;
+	public boolean StaffAccessEnabled = false;
+	public boolean TesterAccessEnabled = false;
+	public boolean AlternateAccessEnabled = false;
+	public boolean OtherAccessEnabled = false;
+	public boolean ConfigAccessEnabled = false;
+	public boolean ServerCooldownEnabled = true;
+	public long ServerCooldownDuration = 60; // In seconds based on from start of plugin.
+	public long delayBeforeStartingKicks = 4; // In seconds.
+	public long kickDelayPerPlayer = 1; // In seconds.
+	public String hubServer = "lobby";
+	public String notwhitelistmsg = "&eSorry, the server is currently in Whitelist mode, please enjoy one of our other servers. :)";
+	public String broadcastmsg = "&eSorry, the server is currently in Whitelist mode, please enjoy one of our other servers. :)";
+	public String sendmsg = "&eSorry, the server is currently in Whitelist mode, please enjoy one of our other servers. :)";
+	public String kickmsg = "&eSorry, the server is currently in Whitelist mode, please enjoy one of our other servers. :)";
 
 	public WLStorage(AdvancedWhiteList m) {
         this.m = m;
