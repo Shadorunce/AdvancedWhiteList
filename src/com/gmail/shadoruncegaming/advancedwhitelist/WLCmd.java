@@ -11,6 +11,12 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+
 public class WLCmd implements CommandExecutor {
 	private AdvancedWhiteList m;
 	String prefix = "&6&lA&e&lWL > &7";
@@ -23,7 +29,20 @@ public class WLCmd implements CommandExecutor {
 		if (!snd.hasPermission("advancedwhitelist.admin") && !snd.hasPermission("easywhitelist.admin")) {
 			Utility.sendMsg(snd, prefix);
 			return true;
-		} if (strings.length == 0) {
+		} 
+
+		if (snd instanceof Player) {
+			TextComponent prfx = new TextComponent("AWL > ");
+			prfx.setColor(ChatColor.GOLD);
+			prfx.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to open GUI for ").color(ChatColor.GOLD).append("Advanced").color(ChatColor.GOLD).append("WhiteList").color(ChatColor.GREEN).create()));
+			prfx.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/awl gui"));
+			snd.spigot().sendMessage(prfx);
+		}
+		
+		if (!(snd instanceof Player)) Utility.sendMsg(snd, "&6&lA&a&lWL&7>");
+		
+		
+		if (strings.length == 0) {
 			this.getStatus(snd);
 			return true;
 		} else {
@@ -37,8 +56,6 @@ public class WLCmd implements CommandExecutor {
 		String names;
 		Long time;
 		String cmd = args[0].toLowerCase();
-
-		Utility.sendMsg(snd, "&6&lA&a&lWL&7>");
 		
 		if (args.length == 0) {
 			this.getStatus(snd);
