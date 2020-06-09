@@ -8,7 +8,7 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 
 public class AdvancedWhiteList extends JavaPlugin implements PluginMessageListener {
-	public Long start = System.currentTimeMillis();
+	public static Long start = System.currentTimeMillis();
 	private static AdvancedWhiteList instance;
 	private WLGui gui;
 	private WLStorage storage;
@@ -27,16 +27,17 @@ public class AdvancedWhiteList extends JavaPlugin implements PluginMessageListen
 		this.saveDefaultConfig();
 		this.saveConfig();
 		this.getCommand("advancedwhitelist").setExecutor(new WLCmd(this));
-		this.getServer().getPluginManager().registerEvents(new WLEvent(this), this);
-		this.getServer().getPluginManager().registerEvents(new WLGui(this), this);
-		this.event = new WLEvent(this);
+		this.getServer().getPluginManager().registerEvents(new WLEvent(), this);
+		this.getServer().getPluginManager().registerEvents(new WLGui(), this);
+		this.event = new WLEvent();
     	this.gui = this.getGUI();
 		Utility.sendConsole("&6&lAdvanced&a&lWhitelist &7> Loaded!");
-		getStorage().reload();
+		getStorage();
+		WLStorage.reload();
 	}
 
 	public void setStart() {
-		this.start = System.currentTimeMillis();
+		AdvancedWhiteList.start = System.currentTimeMillis();
 		return;
 	}
 	

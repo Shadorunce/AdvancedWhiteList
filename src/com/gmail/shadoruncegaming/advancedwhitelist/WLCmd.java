@@ -38,7 +38,7 @@ public class WLCmd implements CommandExecutor {
 		Long time;
 		String cmd = args[0].toLowerCase();
 
-		Utility.sendMsg(snd, "&6&lAdvanced&a&lWhitelist &7>");
+		Utility.sendMsg(snd, "&6&lA&a&lWL&7>");
 		
 		if (args.length == 0) {
 			this.getStatus(snd);
@@ -86,7 +86,7 @@ public class WLCmd implements CommandExecutor {
 			case "reload":
 			case "rel":
 			case "rl":
-				this.m.getStorage().reload();
+				WLStorage.reload();
 				return;
 			
 			case "remove":
@@ -98,7 +98,7 @@ public class WLCmd implements CommandExecutor {
 					return;
 				}
 				names = args[1];
-				this.m.getStorage().removeWhitelist(names);
+				WLStorage.removeWhitelist(names);
 				Utility.sendMsg(snd, prefix + "Whitelist removed for &c" + names);
 				return;
 			
@@ -111,7 +111,7 @@ public class WLCmd implements CommandExecutor {
 				}
 	
 				names = args[1];
-				this.m.getStorage().addWhitelist(names);
+				WLStorage.addWhitelist(names);
 				Utility.sendMsg(snd, prefix + "Whitelisted &a" + names);
 				return;
 			
@@ -121,7 +121,7 @@ public class WLCmd implements CommandExecutor {
 				names = "";
 	
 				String str;
-				for (Iterator<String> var6 = this.m.getStorage().getWhiteLists().iterator(); var6
+				for (Iterator<String> var6 = WLStorage.getWhiteLists().iterator(); var6
 						.hasNext(); names = names + str + "&e&l, &7") {
 					str = (String) var6.next();
 				}
@@ -136,8 +136,8 @@ public class WLCmd implements CommandExecutor {
 			case "listclear":
 			case "removeall":
 			case "rall":
-				for (String n : this.m.getStorage().getWhiteLists()) {
-					this.m.getStorage().removeWhitelist(n);
+				for (String n : WLStorage.getWhiteLists()) {
+					WLStorage.removeWhitelist(n);
 				}
 			
 			case "whitelist":
@@ -147,7 +147,7 @@ public class WLCmd implements CommandExecutor {
 			case "whiteliston":
 			case "wlon":
 			case "on":
-				this.m.getStorage().setWhitelist(true);
+				WLStorage.setWhitelist(true);
 				Utility.sendMsg(snd, prefix + "&fWhitelist is now &a&lON&f!");
 				Utility.sendMsg(snd, "&f=======================");
 				this.getStatus(snd);
@@ -158,7 +158,7 @@ public class WLCmd implements CommandExecutor {
 			case "wloff":
 			case "off":
 			case "of":
-				this.m.getStorage().setWhitelist(false);
+				WLStorage.setWhitelist(false);
 				Utility.sendMsg(snd, prefix + "&fWhitelist is &c&lOFF!&8");
 				Utility.sendMsg(snd, "&f=======================");
 				this.getStatus(snd);
@@ -170,7 +170,7 @@ public class WLCmd implements CommandExecutor {
 			case "servercd":
 			case "scd":
 			case "cd":
-				Utility.sendMsg(snd, "&e> &fServer Start to Player Login Cooldown Enabled: &e" + this.m.getStorage().isServerCooldown());
+				Utility.sendMsg(snd, "&e> &fServer Start to Player Login Cooldown Enabled: &e" + WLStorage.isServerCooldown());
 				return;
 			case "servercooldownon":
 			case "scooldownon":
@@ -178,7 +178,7 @@ public class WLCmd implements CommandExecutor {
 			case "servercdon":
 			case "scdon":
 			case "cdon":
-				this.m.getStorage().setServerCooldown(true);
+				WLStorage.setServerCooldown(true);
 				Utility.sendMsg(snd, prefix + "&fServer Start to Player Login Cooldown is now &a&lON&f!");
 				Utility.sendMsg(snd, "&f=======================");
 				this.getStatus(snd);
@@ -191,7 +191,7 @@ public class WLCmd implements CommandExecutor {
 			case "scdoff":
 			case "cdoff":
 			case "cdof":
-				this.m.getStorage().setServerCooldown(false);
+				WLStorage.setServerCooldown(false);
 				Utility.sendMsg(snd, prefix + "&fServer Start to Player Login Cooldown is &c&lOFF!&8");
 				Utility.sendMsg(snd, "&f=======================");
 				this.getStatus(snd);
@@ -208,9 +208,9 @@ public class WLCmd implements CommandExecutor {
 			case "test":
 				this.m.setStart();
 				Utility.sendMsg(snd, prefix + "&fCooldown reset to now. This is only used for testing purposes only.");
-				Utility.sendMsg(snd, prefix + "&fPlayers will need to wait " + m.getStorage().getServerCooldown() + " seconds.");
-				Utility.sendMsg(snd, prefix + "&fProjectTeam will need to wait " + (m.getStorage().getServerCooldown()/2) + " seconds.");
-				Utility.sendMsg(snd, prefix + "&fOperators will need to wait " + m.getStorage().getServerCooldown()/3 + " seconds.");
+				Utility.sendMsg(snd, prefix + "&fPlayers will need to wait " + WLStorage.getServerCooldown() + " seconds.");
+				Utility.sendMsg(snd, prefix + "&fProjectTeam will need to wait " + (WLStorage.getServerCooldown()/2) + " seconds.");
+				Utility.sendMsg(snd, prefix + "&fOperators will need to wait " + WLStorage.getServerCooldown()/3 + " seconds.");
 				return;
 				
 			case "servercooldowntime":
@@ -227,7 +227,7 @@ public class WLCmd implements CommandExecutor {
 				}
 				try {
 					time = Long.parseLong(args[1]);
-					this.m.getStorage().setServerCooldownTime(time);
+					WLStorage.setServerCooldownTime(time);
 					Utility.sendMsg(snd, prefix + "Server Start to Player Login Cooldown is now: &e" + time);
 					return;
 				}
@@ -248,7 +248,7 @@ public class WLCmd implements CommandExecutor {
 					Utility.sendMsg(snd, "&7Please input a message!");
 					return;
 				}
-				this.m.getStorage().setHubServer(args[1]);
+				WLStorage.setHubServer(args[1]);
 				Utility.sendMsg(snd, prefix + "New Hub Server Set: &a" + args[1]);
 				return;
 				
@@ -262,7 +262,7 @@ public class WLCmd implements CommandExecutor {
 				}
 				try {
 					time = Long.parseLong(args[1]);
-					this.m.getStorage().setDelayBeforeStartingKicks(time);
+					WLStorage.setDelayBeforeStartingKicks(time);
 					Utility.sendMsg(snd, prefix + "Server Start to Player Login Cooldown is now: " + time);
 					return;
 				}
@@ -283,7 +283,7 @@ public class WLCmd implements CommandExecutor {
 				}
 				try {
 					time = Long.parseLong(args[1]);
-					this.m.getStorage().setKickDelayPerPlayer(time);
+					WLStorage.setKickDelayPerPlayer(time);
 					Utility.sendMsg(snd, this.prefix + "Server Start to Player Login Cooldown is now: " + time);
 					return;
 				}
@@ -303,7 +303,7 @@ public class WLCmd implements CommandExecutor {
 					Utility.sendMsg(snd, "&7Please input a message!");
 					return;
 				}
-				this.m.getStorage().setNotWhitelistMsg(msgOnly(args));
+				WLStorage.setNotWhitelistMsg(msgOnly(args));
 				Utility.sendMsg(snd, prefix + "New Send Message &a" + msgOnly(args));
 				return;
 
@@ -318,7 +318,7 @@ public class WLCmd implements CommandExecutor {
 					Utility.sendMsg(snd, "&7Please input a message!");
 					return;
 				}
-				this.m.getStorage().setBroadcastMsg(msgOnly(args));
+				WLStorage.setBroadcastMsg(msgOnly(args));
 				Utility.sendMsg(snd, prefix + "New Send Message: " + msgOnly(args));
 				return;
 
@@ -330,7 +330,7 @@ public class WLCmd implements CommandExecutor {
 					Utility.sendMsg(snd, "&7Please input a message!");
 					return;
 				}
-				this.m.getStorage().setSendMsg(msgOnly(args));
+				WLStorage.setSendMsg(msgOnly(args));
 				Utility.sendMsg(snd, prefix + "New Send Message: " + msgOnly(args));
 				return;
 
@@ -342,14 +342,14 @@ public class WLCmd implements CommandExecutor {
 					Utility.sendMsg(snd, "&7Please input a message!");
 					return;
 				}
-				this.m.getStorage().setKickMsg(msgOnly(args));
+				WLStorage.setKickMsg(msgOnly(args));
 				Utility.sendMsg(snd, prefix + "New Send Message: " + msgOnly(args));
 				return;
 			
 			case "projectteamaccess":
 			case "projectteam":
 			case "pta":
-				Utility.sendMsg(snd, "&e> &fProjectTeam Access Enabled: " + this.m.getStorage().isProjectTeamAccess());
+				Utility.sendMsg(snd, "&e> &fProjectTeam Access Enabled: " + WLStorage.isProjectTeamAccess());
 				return;
 				
 			case "projectteamon":
@@ -357,7 +357,7 @@ public class WLCmd implements CommandExecutor {
 			case "teamon":
 			case "ptaon":
 			case "pon":
-				this.m.getStorage().setProjectTeamAccess(true);
+				WLStorage.setProjectTeamAccess(true);
 				Utility.sendMsg(snd, prefix + "&fProjectTeamAccess is now &a&lON&f!");
 				Utility.sendMsg(snd, "&f=======================");
 				this.getStatus(snd);
@@ -368,7 +368,7 @@ public class WLCmd implements CommandExecutor {
 			case "ptaoff":
 			case "poff":
 			case "pof":
-				this.m.getStorage().setProjectTeamAccess(false);
+				WLStorage.setProjectTeamAccess(false);
 				Utility.sendMsg(snd, prefix + "&fProjectTeamAccess is &c&lOFF!&8");
 				Utility.sendMsg(snd, "&f=======================");
 				this.getStatus(snd);
@@ -376,13 +376,13 @@ public class WLCmd implements CommandExecutor {
 			
 			case "staffaccess":
 			case "sa":
-				Utility.sendMsg(snd, "&e> &fStaff Enabled: &e" + this.m.getStorage().isStaffAccess());
+				Utility.sendMsg(snd, "&e> &fStaff Enabled: &e" + WLStorage.isStaffAccess());
 				return;
 				
 			case "staffon":
 			case "saon":
 			case "son":
-				this.m.getStorage().setStaffAccess(true);
+				WLStorage.setStaffAccess(true);
 				Utility.sendMsg(snd, prefix + "&fStaffAccess is now &a&lON&f!");
 				Utility.sendMsg(snd, "&f=======================");
 				this.getStatus(snd);
@@ -391,7 +391,7 @@ public class WLCmd implements CommandExecutor {
 			case "saoff":
 			case "soff":
 			case "sof":
-				this.m.getStorage().setStaffAccess(false);
+				WLStorage.setStaffAccess(false);
 				Utility.sendMsg(snd, prefix + "&fStaffAccess is &c&lOFF!&8");
 				Utility.sendMsg(snd, "&f=======================");
 				this.getStatus(snd);
@@ -399,13 +399,13 @@ public class WLCmd implements CommandExecutor {
 			
 			case "testeraccess":
 			case "ta":
-				Utility.sendMsg(snd, "&e> &7Tester Enabled: &e" + this.m.getStorage().isTesterAccess());
+				Utility.sendMsg(snd, "&e> &7Tester Enabled: &e" + WLStorage.isTesterAccess());
 				return;
 				
 			case "testeron":
 			case "taon":
 			case "ton":
-				this.m.getStorage().setTesterAccess(true);
+				WLStorage.setTesterAccess(true);
 				Utility.sendMsg(snd, prefix + "&fTesterAccess is now &a&lON&f!");
 				Utility.sendMsg(snd, "&f=======================");
 				this.getStatus(snd);
@@ -414,7 +414,7 @@ public class WLCmd implements CommandExecutor {
 			case "taoff":
 			case "toff":
 			case "tof":
-				this.m.getStorage().setTesterAccess(false);
+				WLStorage.setTesterAccess(false);
 				Utility.sendMsg(snd, prefix + "&fTesterAccess is &c&lOFF!&8");
 				Utility.sendMsg(snd, "&f=======================");
 				this.getStatus(snd);
@@ -422,14 +422,14 @@ public class WLCmd implements CommandExecutor {
 			
 			case "alternateaccess":
 			case "aa":
-				Utility.sendMsg(snd, "&e> &7Alternate Enabled: &e" + this.m.getStorage().isAlternateAccess());
+				Utility.sendMsg(snd, "&e> &7Alternate Enabled: &e" + WLStorage.isAlternateAccess());
 			return;
 				
 			case "alternateon":				
 			case "alteon":
 			case "aaon":
 			case "aon":
-				this.m.getStorage().setAlternateAccess(true);
+				WLStorage.setAlternateAccess(true);
 				Utility.sendMsg(snd, prefix + "&fAlternateAccess is now &a&lON&f!");
 				Utility.sendMsg(snd, "&f=======================");
 				this.getStatus(snd);
@@ -439,7 +439,7 @@ public class WLCmd implements CommandExecutor {
 			case "aaoff":
 			case "aoff":
 			case "aof":
-				this.m.getStorage().setAlternateAccess(false);
+				WLStorage.setAlternateAccess(false);
 				Utility.sendMsg(snd, prefix + "&fAlternateAccess is &c&lOFF!&8");
 				Utility.sendMsg(snd, "&f=======================");
 				this.getStatus(snd);
@@ -448,14 +448,14 @@ public class WLCmd implements CommandExecutor {
 			case "otheraccess":
 			case "oa":
 			case "oo":
-				Utility.sendMsg(snd, "&e> &fOther Enabled: &e" + this.m.getStorage().isOtherAccess());
+				Utility.sendMsg(snd, "&e> &fOther Enabled: &e" + WLStorage.isOtherAccess());
 				return;
 				
 			case "otheron":
 			case "oaon":
 			case "ooon":
 			case "oon":
-				this.m.getStorage().setOtherAccess(true);
+				WLStorage.setOtherAccess(true);
 				Utility.sendMsg(snd, prefix + "&fOtherAccess is now &a&lON&f!");
 				Utility.sendMsg(snd, "&f=======================");
 				this.getStatus(snd);
@@ -465,7 +465,7 @@ public class WLCmd implements CommandExecutor {
 			case "oooff":
 			case "ooff":
 			case "oof":
-				this.m.getStorage().setOtherAccess(false);
+				WLStorage.setOtherAccess(false);
 				Utility.sendMsg(snd, prefix + "&fOtherAccess is &c&lOFF!&8");
 				Utility.sendMsg(snd, "&f=======================");
 				this.getStatus(snd);
@@ -473,13 +473,13 @@ public class WLCmd implements CommandExecutor {
 				
 			case "configaccess":
 			case "ca":
-				Utility.sendMsg(snd, "&e> &fConfig Enabled: &e" + this.m.getStorage().isConfigAccess());
+				Utility.sendMsg(snd, "&e> &fConfig Enabled: &e" + WLStorage.isConfigAccess());
 				return;
 				
 			case "configon":
 			case "caon":
 			case "con":
-				this.m.getStorage().setConfigAccess(true);
+				WLStorage.setConfigAccess(true);
 				Utility.sendMsg(snd, prefix + "&fConfigAccess is now &a&lON&f!");
 				Utility.sendMsg(snd, "&f=======================");
 				this.getStatus(snd);
@@ -488,7 +488,7 @@ public class WLCmd implements CommandExecutor {
 			case "caoff":
 			case "coff":
 			case "cof":
-				this.m.getStorage().setConfigAccess(false);
+				WLStorage.setConfigAccess(false);
 				Utility.sendMsg(snd, prefix + "&fConfigAccess is &c&lOFF!&8");
 				Utility.sendMsg(snd, "&f=======================");
 				this.getStatus(snd);
@@ -500,13 +500,13 @@ public class WLCmd implements CommandExecutor {
 			case "lockdown":
 			case "alloff":
 			case "allof":
-				this.m.getStorage().setWhitelist(true);
-				this.m.getStorage().setProjectTeamAccess(false);
-				this.m.getStorage().setStaffAccess(false);
-				this.m.getStorage().setTesterAccess(false);
-				this.m.getStorage().setAlternateAccess(false);
-				this.m.getStorage().setOtherAccess(false);
-				this.m.getStorage().setConfigAccess(false);
+				WLStorage.setWhitelist(true);
+				WLStorage.setProjectTeamAccess(false);
+				WLStorage.setStaffAccess(false);
+				WLStorage.setTesterAccess(false);
+				WLStorage.setAlternateAccess(false);
+				WLStorage.setOtherAccess(false);
+				WLStorage.setConfigAccess(false);
 				Utility.sendMsg(snd, prefix + "&cFull lockdown enabled!");
 				Utility.sendMsg(snd, prefix + "&cYou will still need to send or kick unwanted players!");
 				Utility.sendMsg(snd, "&f=======================");
@@ -515,13 +515,13 @@ public class WLCmd implements CommandExecutor {
 				
 			case "halfblock":
 			case "staffonly":
-				this.m.getStorage().setWhitelist(true);
-				this.m.getStorage().setProjectTeamAccess(true);
-				this.m.getStorage().setStaffAccess(true);
-				this.m.getStorage().setTesterAccess(false);
-				this.m.getStorage().setAlternateAccess(false);
-				this.m.getStorage().setOtherAccess(false);
-				this.m.getStorage().setConfigAccess(false);
+				WLStorage.setWhitelist(true);
+				WLStorage.setProjectTeamAccess(true);
+				WLStorage.setStaffAccess(true);
+				WLStorage.setTesterAccess(false);
+				WLStorage.setAlternateAccess(false);
+				WLStorage.setOtherAccess(false);
+				WLStorage.setConfigAccess(false);
 				Utility.sendMsg(snd, prefix + "&6Server is set to staff only!");
 				Utility.sendMsg(snd, prefix + "&cYou will still need to send or kick unwanted players!");
 				Utility.sendMsg(snd, "&f=======================");
@@ -534,13 +534,13 @@ public class WLCmd implements CommandExecutor {
 			case "only":
 			case "send":
 			case "enforce":
-				Utility.sendMsg(snd, prefix + "&6Whitelist is  " + this. m.getStorage().isWhitelisting());
-					if (this.m.getStorage().isWhitelisting()) {
-						Utility.broadcast(this.m.getStorage().getBroadcastMsg());
+				Utility.sendMsg(snd, prefix + "&6Whitelist is  " + WLStorage.isWhitelisting());
+					if (WLStorage.isWhitelisting()) {
+						Utility.broadcast(WLStorage.getBroadcastMsg());
 						Utility.sendMsg(snd, prefix + "&6Sending non-whitelisted players back to Lobby based on the status below!");
 						getStatus(snd);
 						try {
-				            Thread.sleep(this.m.getStorage().getDelayBeforeStartingKicks()*1000);
+				            Thread.sleep(WLStorage.getDelayBeforeStartingKicks()*1000);
 				        } catch (InterruptedException e) {
 				            e.printStackTrace();
 				        }
@@ -550,28 +550,28 @@ public class WLCmd implements CommandExecutor {
 						return;
 					}
 			case "restart":
-				Boolean currentWL = this.m.getStorage().isWhitelisting();
-				Boolean currentCA = this.m.getStorage().isConfigAccess();
-				Boolean currentPA = this.m.getStorage().isProjectTeamAccess();
-				Boolean currentSA = this.m.getStorage().isStaffAccess();
-				Boolean currentAA = this.m.getStorage().isAlternateAccess();
-				Boolean currentTA = this.m.getStorage().isTesterAccess();
-				Boolean currentOA = this.m.getStorage().isOtherAccess();
+				Boolean currentWL = WLStorage.isWhitelisting();
+				Boolean currentCA = WLStorage.isConfigAccess();
+				Boolean currentPA = WLStorage.isProjectTeamAccess();
+				Boolean currentSA = WLStorage.isStaffAccess();
+				Boolean currentAA = WLStorage.isAlternateAccess();
+				Boolean currentTA = WLStorage.isTesterAccess();
+				Boolean currentOA = WLStorage.isOtherAccess();
 
-				this.m.getStorage().setWhitelist(true);
-				this.m.getStorage().setProjectTeamAccess(false);
-				this.m.getStorage().setStaffAccess(false);
-				this.m.getStorage().setTesterAccess(false);
-				this.m.getStorage().setAlternateAccess(false);
-				this.m.getStorage().setOtherAccess(false);
-				this.m.getStorage().setConfigAccess(false);				
-				Utility.sendMsg(snd, prefix + "&6Whitelist is  " + this.m.getStorage().isWhitelisting());
+				WLStorage.setWhitelist(true);
+				WLStorage.setProjectTeamAccess(false);
+				WLStorage.setStaffAccess(false);
+				WLStorage.setTesterAccess(false);
+				WLStorage.setAlternateAccess(false);
+				WLStorage.setOtherAccess(false);
+				WLStorage.setConfigAccess(false);				
+				Utility.sendMsg(snd, prefix + "&6Whitelist is  " + WLStorage.isWhitelisting());
 					
-				Utility.broadcast(this.m.getStorage().getBroadcastMsg());
+				Utility.broadcast(WLStorage.getBroadcastMsg());
 				Utility.sendMsg(snd, prefix + "&6Sending non-whitelisted players back to Lobby based on the status below!");
 				getStatus(snd);
 				try {
-		            Thread.sleep(this.m.getStorage().getDelayBeforeStartingKicks()*1000);
+		            Thread.sleep(WLStorage.getDelayBeforeStartingKicks()*1000);
 		        } catch (InterruptedException e) {
 		            e.printStackTrace();
 		        }
@@ -579,13 +579,13 @@ public class WLCmd implements CommandExecutor {
 				Utility.sendMsg(snd, prefix + "&aDone sending non-whitelisted players!");
 				Utility.sendMsg(snd, prefix + "&cIf players are still connected, check the Whitelist settings.");
 
-				this.m.getStorage().setWhitelist(currentWL);
-				this.m.getStorage().setProjectTeamAccess(currentPA);
-				this.m.getStorage().setStaffAccess(currentSA);
-				this.m.getStorage().setTesterAccess(currentTA);
-				this.m.getStorage().setAlternateAccess(currentAA);
-				this.m.getStorage().setOtherAccess(currentOA);
-				this.m.getStorage().setConfigAccess(currentCA);
+				WLStorage.setWhitelist(currentWL);
+				WLStorage.setProjectTeamAccess(currentPA);
+				WLStorage.setStaffAccess(currentSA);
+				WLStorage.setTesterAccess(currentTA);
+				WLStorage.setAlternateAccess(currentAA);
+				WLStorage.setOtherAccess(currentOA);
+				WLStorage.setConfigAccess(currentCA);
 				
 				Bukkit.shutdown();
 				
@@ -616,15 +616,15 @@ public class WLCmd implements CommandExecutor {
 				try {
 					out.writeUTF("ConnectOther");
 					out.writeUTF(pname);
-					out.writeUTF(this.m.getStorage().getHubServer());
+					out.writeUTF(WLStorage.getHubServer());
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				Utility.sendMsg(p, prefix + this.m.getStorage().getSendMsg());
+				Utility.sendMsg(p, prefix + WLStorage.getSendMsg());
 				p.sendPluginMessage(this.m, "BungeeCord", bout.toByteArray());
 
 				try {
-		            Thread.sleep(this.m.getStorage().getKickDelayPerPlayer() * 1000);
+		            Thread.sleep(WLStorage.getKickDelayPerPlayer() * 1000);
 		        } catch (InterruptedException e) {
 		            e.printStackTrace();
 		        }
@@ -633,7 +633,7 @@ public class WLCmd implements CommandExecutor {
 					playersSent++;
 				}
 				if (Bukkit.getOnlinePlayers().contains(p)) {
-					p.kickPlayer(this.m.getStorage().getKickMsg());
+					p.kickPlayer(WLStorage.getKickMsg());
 					playersKicked++;
 //					Utility.sendMsg(snd, prefix + "&eKicked " + pname + " as lobby wasn't available or send failed.");
 				}
@@ -667,30 +667,30 @@ public class WLCmd implements CommandExecutor {
 		Utility.sendMsg(snd, "&e> &7Use &a&l/awl help &r&7for commands list.");
 		Utility.sendMsg(snd, "&e> &7Use &a&l/awl msgs &r&7for Messages list.");
 		Utility.sendMsg(snd, "&e> &7========== Access Settings ==========");
-		Utility.sendMsg(snd, "&e> &7Whitelisting Enabled: &e" + this.m.getStorage().isWhitelisting());
-		Utility.sendMsg(snd, "&e> &7Config Access Enabled: &e" + this.m.getStorage().isConfigAccess());
-		Utility.sendMsg(snd, "&e> &7ProjectTeam Access Enabled: &e" + this.m.getStorage().isProjectTeamAccess());
-		Utility.sendMsg(snd, "&e> &7Staff Access Enabled: &e" + this.m.getStorage().isStaffAccess());
-		Utility.sendMsg(snd, "&e> &7Tester Access Enabled: &e" + this.m.getStorage().isTesterAccess());
-		Utility.sendMsg(snd, "&e> &7Alternate Access Enabled: &e" + this.m.getStorage().isAlternateAccess());
-		Utility.sendMsg(snd, "&e> &7Other Access Enabled: &e" + this.m.getStorage().isOtherAccess());
+		Utility.sendMsg(snd, "&e> &7Whitelisting Enabled: &e" + WLStorage.isWhitelisting());
+		Utility.sendMsg(snd, "&e> &7Config Access Enabled: &e" + WLStorage.isConfigAccess());
+		Utility.sendMsg(snd, "&e> &7ProjectTeam Access Enabled: &e" + WLStorage.isProjectTeamAccess());
+		Utility.sendMsg(snd, "&e> &7Staff Access Enabled: &e" + WLStorage.isStaffAccess());
+		Utility.sendMsg(snd, "&e> &7Tester Access Enabled: &e" + WLStorage.isTesterAccess());
+		Utility.sendMsg(snd, "&e> &7Alternate Access Enabled: &e" + WLStorage.isAlternateAccess());
+		Utility.sendMsg(snd, "&e> &7Other Access Enabled: &e" + WLStorage.isOtherAccess());
 		Utility.sendMsg(snd, "&e> &7========== Misc Settings ==========");
-		Utility.sendMsg(snd, "&e> &7Hub Server: &e" + this.m.getStorage().getHubServer());
-		Utility.sendMsg(snd, "&e> &7Server Start to Player Login Cooldown Enabled: &e" + this.m.getStorage().isServerCooldown());
-		Utility.sendMsg(snd, "&e> &7Server Cooldown time: &e" + this.m.getStorage().getServerCooldown() + " Seconds");
-		Utility.sendMsg(snd, "&e> &7Delay time in seconds before starting kicks: &e" + this.m.getStorage().getDelayBeforeStartingKicks() + " Seconds");
-		Utility.sendMsg(snd, "&e> &7Delay time between player being kicked and checked: &e" + this.m.getStorage().getKickDelayPerPlayer() + " Seconds");
+		Utility.sendMsg(snd, "&e> &7Hub Server: &e" + WLStorage.getHubServer());
+		Utility.sendMsg(snd, "&e> &7Server Start to Player Login Cooldown Enabled: &e" + WLStorage.isServerCooldown());
+		Utility.sendMsg(snd, "&e> &7Server Cooldown time: &e" + WLStorage.getServerCooldown() + " Seconds");
+		Utility.sendMsg(snd, "&e> &7Delay time in seconds before starting kicks: &e" + WLStorage.getDelayBeforeStartingKicks() + " Seconds");
+		Utility.sendMsg(snd, "&e> &7Delay time between player being kicked and checked: &e" + WLStorage.getKickDelayPerPlayer() + " Seconds");
 	}
 	
 	void getMsgs(CommandSender snd) {
 
-		Utility.sendMsg(snd, "&e> &7Not Whitelisted message: &e" + this.m.getStorage().getNotWhitelistMsg());
+		Utility.sendMsg(snd, "&e> &7Not Whitelisted message: &e" + WLStorage.getNotWhitelistMsg());
 		Utility.sendMsg(snd, "&e> &7");
-		Utility.sendMsg(snd, "&e> &7Send/Kick broadcast message: &e" + this.m.getStorage().getBroadcastMsg());
+		Utility.sendMsg(snd, "&e> &7Send/Kick broadcast message: &e" + WLStorage.getBroadcastMsg());
 		Utility.sendMsg(snd, "&e> &7");
-		Utility.sendMsg(snd, "&e> &7Message sent to player just before they are sent to Hub Server: &e" + this.m.getStorage().getSendMsg());
+		Utility.sendMsg(snd, "&e> &7Message sent to player just before they are sent to Hub Server: &e" + WLStorage.getSendMsg());
 		Utility.sendMsg(snd, "&e> &7");
-		Utility.sendMsg(snd, "&e> &7Message sent to player when a player is kicked from the network: &e" + this.m.getStorage().getKickMsg());
+		Utility.sendMsg(snd, "&e> &7Message sent to player when a player is kicked from the network: &e" + WLStorage.getKickMsg());
 	}
 	
 	void HelpMenu(CommandSender snd) {

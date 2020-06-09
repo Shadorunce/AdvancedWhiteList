@@ -16,59 +16,48 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public class WLGui implements Listener {
-	private static AdvancedWhiteList m;
-	private static Inventory inv = Bukkit.createInventory(null, 27, "AdvancedWhiteList");
+	private static Inventory inv;
+	static String tfClick = "§6Click material to toggle §aTrue§6/§cFalse.";
+	static String intClick1 = "§6Left click material to §aIncrease.";
+	static String intClick2 = "§6Right click material to §bDecrease.";
+	static String intClick3 = "§6Middle click material to type amount.";
+	static String msgClick = "§6Left Click material to type a new text.";
+	static String msgClick2 = "§6Right Click material to view the full message in chat.";
 	
-	
-    public WLGui(AdvancedWhiteList m)
-    {
-		WLGui.m = m;
-		// Create a new inventory, with "this" owner for comparison with other inventories, a size of nine, called example
-    	//this.inv = Bukkit.createInventory(null, 27, "AdvancedWhiteList");
-        // Put the items into the inventory
-    }
-
-
-
     // You can call this whenever you want to put the items in
     public static void initializeItems()
     {
-		inv = Bukkit.createInventory(null, 27, "AdvancedWhiteList");
+		inv = Bukkit.createInventory(null, 27, ChatColor.GOLD + "AdvancedWhiteList");
     	
-    	WLStorage Storage = new WLStorage(m);
-    	Storage.reload();
-    	String tfClick = "§6Click material to toggle §aTrue§6/§cFalse.";
-    	String intClick1 = "§6Left click material to §aIncrease.";
-    	String intClick2 = "§6Right click material to §bDecrease.";
-    	String intClick3 = "§6Middle click material to type amount.";
-    	String msgClick = "§6Click material to type a new text.";
+    	WLStorage.reload();
         
     	// Filler
     	for (Integer i = 0 ; i < inv.getSize() ; i++) {
-        	inv.setItem(i,createGuiItem(Material.BLACK_STAINED_GLASS_PANE, ChatColor.GOLD + "AWL on: " + getTFColor(Storage.isWhitelisting())));
+        	inv.setItem(i,createGuiItem(Material.BLACK_STAINED_GLASS_PANE, ChatColor.GOLD + "AWL on: " + getTFColor(WLStorage.isWhitelisting())));
         }
     	// setItem(slot, material)
     	// CreateGuiItem(Material, title, lore....)
     	// getGuiMat(determine material based on other variable)
     	// Enabled?
-        inv.setItem(0,createGuiItem(getGUIMat(Storage.isWhitelisting()), "§6Whitelist Enabled", "§eEnabled: " + getTFColor(Storage.isWhitelisting()), tfClick));
-        inv.setItem(1,createGuiItem(getGUIMat(Storage.isConfigAccess()), "§eConfig Access Enabled", "§eEnabled: " + getTFColor(Storage.isConfigAccess()), tfClick));
-        inv.setItem(2,createGuiItem(getGUIMat(Storage.isProjectTeamAccess()), "§eProjectTeam Access Enabled", "§eEnabled: " + getTFColor(Storage.isProjectTeamAccess()), tfClick));
-        inv.setItem(3,createGuiItem(getGUIMat(Storage.isStaffAccess()), "§eStaff Access Enabled", "§eEnabled: " + getTFColor(Storage.isStaffAccess()), tfClick));
-        inv.setItem(4,createGuiItem(getGUIMat(Storage.isTesterAccess()), "§eTester Access Enabled", "§eEnabled: " + getTFColor(Storage.isTesterAccess()), tfClick));
-        inv.setItem(5,createGuiItem(getGUIMat(Storage.isAlternateAccess()), "§eAlternate Access Enabled", "§eEnabled: " + getTFColor(Storage.isAlternateAccess()), tfClick));
-        inv.setItem(6,createGuiItem(getGUIMat(Storage.isOtherAccess()), "§eOther Access Enabled", "§eEnabled: " + getTFColor(Storage.isOtherAccess()), tfClick));
-        inv.setItem(7,createGuiItem(getGUIMat(Storage.isServerCooldown()), "§eServer Cooldown Enabled", "§eEnabled: " + getTFColor(Storage.isServerCooldown()), tfClick));
+        inv.setItem(0,createGuiItem(getGUIMat(WLStorage.isWhitelisting()), "§6Whitelist Enabled", "§eEnabled: " + getTFColor(WLStorage.isWhitelisting()), tfClick));
+        inv.setItem(1,createGuiItem(getGUIMat(WLStorage.isConfigAccess()), "§eConfig Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isConfigAccess()), tfClick));
+        inv.setItem(2,createGuiItem(getGUIMat(WLStorage.isProjectTeamAccess()), "§eProjectTeam Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isProjectTeamAccess()), tfClick));
+        inv.setItem(3,createGuiItem(getGUIMat(WLStorage.isStaffAccess()), "§eStaff Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isStaffAccess()), tfClick));
+        inv.setItem(4,createGuiItem(getGUIMat(WLStorage.isTesterAccess()), "§eTester Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isTesterAccess()), tfClick));
+        inv.setItem(5,createGuiItem(getGUIMat(WLStorage.isAlternateAccess()), "§eAlternate Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isAlternateAccess()), tfClick));
+        inv.setItem(6,createGuiItem(getGUIMat(WLStorage.isOtherAccess()), "§eOther Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isOtherAccess()), tfClick));
+        inv.setItem(7,createGuiItem(getGUIMat(WLStorage.isServerCooldown()), "§eServer Cooldown Enabled", "§eEnabled: " + getTFColor(WLStorage.isServerCooldown()), tfClick));
         // Messages
-        inv.setItem(9,createGuiItem(Material.MAGENTA_STAINED_GLASS_PANE, "§eNot Whitelisted Message", "§eMessage: " + Storage.getNotWhitelistMsg().substring(0, 50), msgClick));
-        inv.setItem(10,createGuiItem(Material.YELLOW_STAINED_GLASS_PANE, "§eBroadcast Message before sending players", "§eMessage: " + Storage.getBroadcastMsg().substring(0, 50), msgClick));
-        inv.setItem(11,createGuiItem(Material.WHITE_STAINED_GLASS_PANE, "§eMessage sent before sending player", "§eMessage: " + Storage.getSendMsg().substring(0, 50), msgClick));
-        inv.setItem(12,createGuiItem(Material.PINK_STAINED_GLASS_PANE, "§eMessage sent if player gets kicked", "§eMessage: " + Storage.getKickMsg().substring(0, 50), msgClick));
-        inv.setItem(13,createGuiItem(Material.ORANGE_STAINED_GLASS_PANE, "§eHub/Lobby server", "§eServer: §6" + Storage.getHubServer(), msgClick, "Refer to Bungee server settings to find Hub/Lobby name."));
+        inv.setItem(9,createGuiItem(Material.MAGENTA_STAINED_GLASS_PANE, "§eNot Whitelisted Message", "§eMessage: " + WLStorage.getNotWhitelistMsg().substring(0, 50) + "[...]", msgClick, msgClick2));
+        inv.setItem(10,createGuiItem(Material.YELLOW_STAINED_GLASS_PANE, "§eBroadcast Message before sending players", "§eMessage: " + WLStorage.getBroadcastMsg().substring(0, 50) + "[...]", msgClick, msgClick2));
+        inv.setItem(11,createGuiItem(Material.WHITE_STAINED_GLASS_PANE, "§eMessage sent before sending player", "§eMessage: " + WLStorage.getSendMsg().substring(0, 50) + "[...]", msgClick, msgClick2));
+        inv.setItem(12,createGuiItem(Material.PINK_STAINED_GLASS_PANE, "§eMessage sent if player gets kicked", "§eMessage: " + WLStorage.getKickMsg().substring(0, 50) + "[...]", msgClick, msgClick2));
+        inv.setItem(13,createGuiItem(Material.ORANGE_STAINED_GLASS_PANE, "§eMessage sent if player gets kicked", "§eServer: §6" + WLStorage.getHubServer(), msgClick, "Refer to Bungee server settings to find Hub/Lobby name."));
         // Durations
-        inv.setItem(18,createGuiItem(Material.BLUE_STAINED_GLASS_PANE, "§eServer Cooldown Duration", "§eDuration: §b" + Storage.getServerCooldown(), intClick1, intClick2, intClick3));
-        inv.setItem(19,createGuiItem(Material.CYAN_STAINED_GLASS_PANE, "§eDelay Before Starting Kicks", "§eDuration: §b" + Storage.getDelayBeforeStartingKicks(), intClick1, intClick2, intClick3));
-        inv.setItem(20,createGuiItem(Material.LIGHT_BLUE_STAINED_GLASS_PANE, "§eKick Delay Per Player", "§eDuration: §b" + Storage.getKickDelayPerPlayer(), intClick1, intClick2, intClick3));
+        inv.setItem(18,createGuiItem(Material.BLUE_STAINED_GLASS_PANE, "§eServer Cooldown Duration", "§eDuration: §b" + WLStorage.getServerCooldown(), intClick1, intClick2, intClick3));
+        inv.setItem(19,createGuiItem(Material.CYAN_STAINED_GLASS_PANE, "§eDelay Before Starting Kicks", "§eDuration: §b" + WLStorage.getDelayBeforeStartingKicks(), intClick1, intClick2, intClick3));
+        inv.setItem(20,createGuiItem(Material.LIGHT_BLUE_STAINED_GLASS_PANE, "§eKick Delay Per Player", "§eDuration: §b" + WLStorage.getKickDelayPerPlayer(), intClick1, intClick2, intClick3));
+        
     }
 
 	public static Material getGUIMat(Boolean trueFalse) {
@@ -111,10 +100,79 @@ public class WLGui implements Listener {
     }
 
     
+    Boolean getTF(Boolean b) {
+    	if (b == true) return false;
+    	else return true;
+    }
+    
     // Check for clicks on items
     @EventHandler
     public void onInventoryClick(final InventoryClickEvent e)
     {
+        Player p = (Player) e.getWhoClicked();
+		e.setCancelled(true);
+    	if (ChatColor.translateAlternateColorCodes('&', e.getView().getTitle()).equals(ChatColor.GOLD + "AdvancedWhiteList")) {
+    		if (e.getCurrentItem() != null) {
+    			String name = e.getCurrentItem().getItemMeta().getDisplayName();
+    			if (name.contains("Whitelist Enabled")) {
+    				WLStorage.setWhitelist(getTF(WLStorage.isWhitelisting()));
+    				inv.setItem(0,createGuiItem(getGUIMat(WLStorage.isWhitelisting()), "§6Whitelist Enabled", "§eEnabled: " + getTFColor(WLStorage.isWhitelisting()), WLGui.tfClick));
+    			}
+    			if (name.contains("Config Access Enabled")) {
+    				WLStorage.setWhitelist(true);
+    				WLStorage.setWhitelist(getTF(WLStorage.isWhitelisting()));
+    			}
+    			if (name.contains("ProjectTeam Access Enabled")) {
+    				WLStorage.setWhitelist(false);
+    				WLStorage.setWhitelist(getTF(WLStorage.isWhitelisting()));
+    			}
+    			if (name.contains("Staff Access Enabled")) {
+    				WLStorage.setWhitelist(getTF(WLStorage.isWhitelisting()));
+    			}
+    			if (name.contains("Tester Access Enabled")) {
+    				WLStorage.setWhitelist(getTF(WLStorage.isWhitelisting()));
+    			}
+    			if (name.contains("Alternate Access Enabled")) {
+    				WLStorage.setWhitelist(getTF(WLStorage.isWhitelisting()));
+    			}
+    			if (name.contains("Other Access Enabled")) {
+    				WLStorage.setWhitelist(getTF(WLStorage.isWhitelisting()));
+    			}
+    			if (name.contains("Server Cooldown Enabled")) {
+    				WLStorage.setWhitelist(getTF(WLStorage.isWhitelisting()));
+    			}
+    			if (name.contains("Not Whitelisted Message")) {
+    				
+    			}
+    			if (name.contains("Broadcast Message before sending players")) {
+    				
+    			}
+    			if (name.contains("Message sent before sending player")) {
+    				
+    			}
+    			if (name.contains("Message sent if player gets kicked")) {
+    				
+    			}
+    			if (name.contains("Message sent if player gets kicked")) {
+    				
+    			}
+    			if (name.contains("Server Cooldown Duration")) {
+    				
+    			}
+    			if (name.contains("Delay Before Starting Kicks")) {
+    				
+    			}
+    			if (name.contains("Kick Delay Per Player")) {
+    				
+    			}
+    			//openInventory(p);
+    			
+    			
+    		}
+    	}
+        
+        
+        
         if (e.getInventory().getHolder() != this) return;
 
         e.setCancelled(true);
@@ -124,7 +182,6 @@ public class WLGui implements Listener {
         // verify current item is not null
         if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
 
-        final Player p = (Player) e.getWhoClicked();
 
         if (clickedItem.getItemMeta().getDisplayName() == "") {
         	if (e.isShiftClick()) {
