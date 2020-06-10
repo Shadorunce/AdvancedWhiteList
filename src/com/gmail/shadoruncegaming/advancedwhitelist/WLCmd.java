@@ -18,11 +18,12 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class WLCmd implements CommandExecutor {
-	private AdvancedWhiteList m;
-	String prefix = "&6&lA&e&lWL > &7";
+	private static AdvancedWhiteList m;
+	static String prefix = "&6&lA&e&lWL > &7";
+	static String names;
 
     public WLCmd(AdvancedWhiteList m) {
-        this.m = m;
+        WLCmd.m = m;
     }
 
 	public boolean onCommand(CommandSender snd, Command pluginCommand, String chatCommand, String[] strings) {	
@@ -31,34 +32,33 @@ public class WLCmd implements CommandExecutor {
 			return true;
 		} 
 
-		if (snd instanceof Player) {
+		
+		if (strings.length == 0) {if (snd instanceof Player) {
 			TextComponent prfx = new TextComponent("AWL > ");
 			prfx.setColor(ChatColor.GOLD);
 			prfx.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to open GUI for ").color(ChatColor.GOLD).append("Advanced").color(ChatColor.GOLD).append("WhiteList").color(ChatColor.GREEN).create()));
 			prfx.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/awl gui"));
 			snd.spigot().sendMessage(prfx);
+			WLGui.openInventory((Player) snd);
+			return true;
 		}
 		
 		if (!(snd instanceof Player)) Utility.sendMsg(snd, "&6&lA&a&lWL&7>");
-		
-		
-		if (strings.length == 0) {
-			this.getStatus(snd);
+			getStatus(snd);
 			return true;
 		} else {
-			this.remanage(snd, strings);
+			remanage(snd, strings);
 			return true;
 		}
 	}
 
 
 	private void remanage(CommandSender snd, String[] args) {
-		String names;
 		Long time;
 		String cmd = args[0].toLowerCase();
 		
 		if (args.length == 0) {
-			this.getStatus(snd);
+			getStatus(snd);
 			return;
 		}
 
@@ -69,31 +69,20 @@ public class WLCmd implements CommandExecutor {
 			case "i":
 			case "status":
 			case "s":
-			default:
-				this.getStatus(snd);
+				getStatus(snd);
 				return;
 				
 			case "messages":
 			case "message":
 			case "msgs":
 			case "msg":
-				this.getMsgs(snd);
+				getMsgs(snd);
 				return;
 				
 			case "help":
 			case "h":
 			case "?":
-				this.getHelp(snd,args);
-				return;
-				
-			case "wlgui":
-			case "gui":
-				if (snd instanceof Player) {
-					WLGui.openInventory((Player) snd);
-					return;
-				}
-
-				Utility.sendMsg(snd, "&7This is a player only Command.");
+				getHelp(snd,args);
 				return;
 				
 				
@@ -110,40 +99,19 @@ public class WLCmd implements CommandExecutor {
 			case "rem":
 			case "re":
 			case "r":
-				if (args.length < 2) {
-					Utility.sendMsg(snd, "&7Please input a name!");
-					return;
-				}
-				names = args[1];
-				WLStorage.removeWhitelist(names);
-				Utility.sendMsg(snd, prefix + "Whitelist removed for &c" + names);
+				removePlayer(snd, args);
 				return;
 			
 			case "add":
 			case "ad":
 			case "a":
-				if (args.length < 2) {
-					Utility.sendMsg(snd, "&7Please input a name!");
-					return;
-				}
-	
-				names = args[1];
-				WLStorage.addWhitelist(names);
-				Utility.sendMsg(snd, prefix + "Whitelisted &a" + names);
+				addPlayer(snd, args);
 				return;
 			
 			case "list":
 			case "li":
 			case "l":
-				names = "";
-	
-				String str;
-				for (Iterator<String> var6 = WLStorage.getWhiteLists().iterator(); var6
-						.hasNext(); names = names + str + "&e&l, &7") {
-					str = (String) var6.next();
-				}
-	
-				Utility.sendMsg(snd, "&a&lWhitelisted: &7" + names);
+				listPlayers(snd);
 				return;
 				
 			case "resetlist":
@@ -153,13 +121,12 @@ public class WLCmd implements CommandExecutor {
 			case "listclear":
 			case "removeall":
 			case "rall":
-				for (String n : WLStorage.getWhiteLists()) {
-					WLStorage.removeWhitelist(n);
-				}
+				resetList();
+				return;
 			
 			case "whitelist":
 			case "wl":
-				this.getStatus(snd);
+				getStatus(snd);
 				return;
 			case "whiteliston":
 			case "wlon":
@@ -167,7 +134,7 @@ public class WLCmd implements CommandExecutor {
 				WLStorage.setWhitelist(true);
 				Utility.sendMsg(snd, prefix + "&fWhitelist is now &a&lON&f!");
 				Utility.sendMsg(snd, "&f=======================");
-				this.getStatus(snd);
+				getStatus(snd);
 				return;
 				
 			case "whitelistoff":
@@ -178,7 +145,7 @@ public class WLCmd implements CommandExecutor {
 				WLStorage.setWhitelist(false);
 				Utility.sendMsg(snd, prefix + "&fWhitelist is &c&lOFF!&8");
 				Utility.sendMsg(snd, "&f=======================");
-				this.getStatus(snd);
+				getStatus(snd);
 				return;
 				
 			case "servercooldown":
@@ -198,7 +165,7 @@ public class WLCmd implements CommandExecutor {
 				WLStorage.setServerCooldown(true);
 				Utility.sendMsg(snd, prefix + "&fServer Start to Player Login Cooldown is now &a&lON&f!");
 				Utility.sendMsg(snd, "&f=======================");
-				this.getStatus(snd);
+				getStatus(snd);
 				return;
 
 			case "servercooldownoff":
@@ -211,7 +178,7 @@ public class WLCmd implements CommandExecutor {
 				WLStorage.setServerCooldown(false);
 				Utility.sendMsg(snd, prefix + "&fServer Start to Player Login Cooldown is &c&lOFF!&8");
 				Utility.sendMsg(snd, "&f=======================");
-				this.getStatus(snd);
+				getStatus(snd);
 				return;
 				
 			case "servercooldowntimetest":
@@ -223,7 +190,7 @@ public class WLCmd implements CommandExecutor {
 			case "scdttest":
 			case "cdttest":
 			case "test":
-				this.m.setStart();
+				m.setStart();
 				Utility.sendMsg(snd, prefix + "&fCooldown reset to now. This is only used for testing purposes only.");
 				Utility.sendMsg(snd, prefix + "&fPlayers will need to wait " + WLStorage.getServerCooldown() + " seconds.");
 				Utility.sendMsg(snd, prefix + "&fProjectTeam will need to wait " + (WLStorage.getServerCooldown()/2) + " seconds.");
@@ -301,7 +268,7 @@ public class WLCmd implements CommandExecutor {
 				try {
 					time = Long.parseLong(args[1]);
 					WLStorage.setKickDelayPerPlayer(time);
-					Utility.sendMsg(snd, this.prefix + "Server Start to Player Login Cooldown is now: " + time);
+					Utility.sendMsg(snd, prefix + "Server Start to Player Login Cooldown is now: " + time);
 					return;
 				}
 				catch (Exception e) {
@@ -377,7 +344,7 @@ public class WLCmd implements CommandExecutor {
 				WLStorage.setProjectTeamAccess(true);
 				Utility.sendMsg(snd, prefix + "&fProjectTeamAccess is now &a&lON&f!");
 				Utility.sendMsg(snd, "&f=======================");
-				this.getStatus(snd);
+				getStatus(snd);
 				return;
 			case "projectteamoff":
 			case "projectoff":
@@ -388,7 +355,7 @@ public class WLCmd implements CommandExecutor {
 				WLStorage.setProjectTeamAccess(false);
 				Utility.sendMsg(snd, prefix + "&fProjectTeamAccess is &c&lOFF!&8");
 				Utility.sendMsg(snd, "&f=======================");
-				this.getStatus(snd);
+				getStatus(snd);
 				return;
 			
 			case "staffaccess":
@@ -402,7 +369,7 @@ public class WLCmd implements CommandExecutor {
 				WLStorage.setStaffAccess(true);
 				Utility.sendMsg(snd, prefix + "&fStaffAccess is now &a&lON&f!");
 				Utility.sendMsg(snd, "&f=======================");
-				this.getStatus(snd);
+				getStatus(snd);
 				return;
 			case "staffoff":
 			case "saoff":
@@ -411,7 +378,7 @@ public class WLCmd implements CommandExecutor {
 				WLStorage.setStaffAccess(false);
 				Utility.sendMsg(snd, prefix + "&fStaffAccess is &c&lOFF!&8");
 				Utility.sendMsg(snd, "&f=======================");
-				this.getStatus(snd);
+				getStatus(snd);
 				return;
 			
 			case "testeraccess":
@@ -425,7 +392,7 @@ public class WLCmd implements CommandExecutor {
 				WLStorage.setTesterAccess(true);
 				Utility.sendMsg(snd, prefix + "&fTesterAccess is now &a&lON&f!");
 				Utility.sendMsg(snd, "&f=======================");
-				this.getStatus(snd);
+				getStatus(snd);
 				return;
 			case "testeroff":
 			case "taoff":
@@ -434,7 +401,7 @@ public class WLCmd implements CommandExecutor {
 				WLStorage.setTesterAccess(false);
 				Utility.sendMsg(snd, prefix + "&fTesterAccess is &c&lOFF!&8");
 				Utility.sendMsg(snd, "&f=======================");
-				this.getStatus(snd);
+				getStatus(snd);
 				return;
 			
 			case "alternateaccess":
@@ -449,7 +416,7 @@ public class WLCmd implements CommandExecutor {
 				WLStorage.setAlternateAccess(true);
 				Utility.sendMsg(snd, prefix + "&fAlternateAccess is now &a&lON&f!");
 				Utility.sendMsg(snd, "&f=======================");
-				this.getStatus(snd);
+				getStatus(snd);
 				return;				
 			case "alternateoff":
 			case "altoff":
@@ -459,7 +426,7 @@ public class WLCmd implements CommandExecutor {
 				WLStorage.setAlternateAccess(false);
 				Utility.sendMsg(snd, prefix + "&fAlternateAccess is &c&lOFF!&8");
 				Utility.sendMsg(snd, "&f=======================");
-				this.getStatus(snd);
+				getStatus(snd);
 				return;
 			
 			case "otheraccess":
@@ -475,7 +442,7 @@ public class WLCmd implements CommandExecutor {
 				WLStorage.setOtherAccess(true);
 				Utility.sendMsg(snd, prefix + "&fOtherAccess is now &a&lON&f!");
 				Utility.sendMsg(snd, "&f=======================");
-				this.getStatus(snd);
+				getStatus(snd);
 				return;
 			case "otheroff":
 			case "oaoff":
@@ -485,7 +452,7 @@ public class WLCmd implements CommandExecutor {
 				WLStorage.setOtherAccess(false);
 				Utility.sendMsg(snd, prefix + "&fOtherAccess is &c&lOFF!&8");
 				Utility.sendMsg(snd, "&f=======================");
-				this.getStatus(snd);
+				getStatus(snd);
 				return;
 				
 			case "configaccess":
@@ -499,7 +466,7 @@ public class WLCmd implements CommandExecutor {
 				WLStorage.setConfigAccess(true);
 				Utility.sendMsg(snd, prefix + "&fConfigAccess is now &a&lON&f!");
 				Utility.sendMsg(snd, "&f=======================");
-				this.getStatus(snd);
+				getStatus(snd);
 				return;
 			case "configoff":
 			case "caoff":
@@ -508,7 +475,7 @@ public class WLCmd implements CommandExecutor {
 				WLStorage.setConfigAccess(false);
 				Utility.sendMsg(snd, prefix + "&fConfigAccess is &c&lOFF!&8");
 				Utility.sendMsg(snd, "&f=======================");
-				this.getStatus(snd);
+				getStatus(snd);
 				return;
 				
 			case "fullblock":
@@ -527,7 +494,7 @@ public class WLCmd implements CommandExecutor {
 				Utility.sendMsg(snd, prefix + "&cFull lockdown enabled!");
 				Utility.sendMsg(snd, prefix + "&cYou will still need to send or kick unwanted players!");
 				Utility.sendMsg(snd, "&f=======================");
-				this.getStatus(snd);
+				getStatus(snd);
 				return;
 				
 			case "halfblock":
@@ -542,7 +509,7 @@ public class WLCmd implements CommandExecutor {
 				Utility.sendMsg(snd, prefix + "&6Server is set to staff only!");
 				Utility.sendMsg(snd, prefix + "&cYou will still need to send or kick unwanted players!");
 				Utility.sendMsg(snd, "&f=======================");
-				this.getStatus(snd);
+				getStatus(snd);
 				return;
 				
 			case "kick":
@@ -551,39 +518,30 @@ public class WLCmd implements CommandExecutor {
 			case "only":
 			case "send":
 			case "enforce":
-				Utility.sendMsg(snd, prefix + "&6Whitelist is  " + WLStorage.isWhitelisting());
-					if (WLStorage.isWhitelisting()) {
-						Utility.broadcast(WLStorage.getBroadcastMsg());
-						Utility.sendMsg(snd, prefix + "&6Sending non-whitelisted players back to Lobby based on the status below!");
-						getStatus(snd);
-						try {
-				            Thread.sleep(WLStorage.getDelayBeforeStartingKicks()*1000);
-				        } catch (InterruptedException e) {
-				            e.printStackTrace();
-				        }
-						playerSendKick(snd);
-						Utility.sendMsg(snd, prefix + "&aDone sending non-whitelisted players!");
-						Utility.sendMsg(snd, prefix + "&cIf players are still connected, check the Whitelist settings.");
-						return;
-					}
+				sendPlayers(snd);
+				return;
 			case "restart":
-				Boolean currentWL = WLStorage.isWhitelisting();
-				Boolean currentCA = WLStorage.isConfigAccess();
-				Boolean currentPA = WLStorage.isProjectTeamAccess();
-				Boolean currentSA = WLStorage.isStaffAccess();
-				Boolean currentAA = WLStorage.isAlternateAccess();
-				Boolean currentTA = WLStorage.isTesterAccess();
-				Boolean currentOA = WLStorage.isOtherAccess();
-
-				WLStorage.setWhitelist(true);
-				WLStorage.setProjectTeamAccess(false);
-				WLStorage.setStaffAccess(false);
-				WLStorage.setTesterAccess(false);
-				WLStorage.setAlternateAccess(false);
-				WLStorage.setOtherAccess(false);
-				WLStorage.setConfigAccess(false);				
-				Utility.sendMsg(snd, prefix + "&6Whitelist is  " + WLStorage.isWhitelisting());
-					
+				restartServer(snd);
+				return;
+				
+			case "wlgui":
+			case "gui":
+			default:
+				if (snd instanceof Player) {
+					WLGui.openInventory((Player) snd);
+					return;
+				}
+				else {
+					getStatus(snd);
+				}
+				return;
+				
+		}
+	}
+	
+	static void sendPlayers(CommandSender snd) {
+		Utility.sendMsg(snd, prefix + "&6Whitelist is  " + WLStorage.isWhitelisting());
+			if (WLStorage.isWhitelisting()) {
 				Utility.broadcast(WLStorage.getBroadcastMsg());
 				Utility.sendMsg(snd, prefix + "&6Sending non-whitelisted players back to Lobby based on the status below!");
 				getStatus(snd);
@@ -595,23 +553,51 @@ public class WLCmd implements CommandExecutor {
 				playerSendKick(snd);
 				Utility.sendMsg(snd, prefix + "&aDone sending non-whitelisted players!");
 				Utility.sendMsg(snd, prefix + "&cIf players are still connected, check the Whitelist settings.");
-
-				WLStorage.setWhitelist(currentWL);
-				WLStorage.setProjectTeamAccess(currentPA);
-				WLStorage.setStaffAccess(currentSA);
-				WLStorage.setTesterAccess(currentTA);
-				WLStorage.setAlternateAccess(currentAA);
-				WLStorage.setOtherAccess(currentOA);
-				WLStorage.setConfigAccess(currentCA);
-				
-				Bukkit.shutdown();
-				
-				return;
-				
-		}
+			}
 	}
 	
-	void playerSendKick(CommandSender snd) {
+	static void restartServer(CommandSender snd) {
+		Boolean currentWL = WLStorage.isWhitelisting();
+		Boolean currentCA = WLStorage.isConfigAccess();
+		Boolean currentPA = WLStorage.isProjectTeamAccess();
+		Boolean currentSA = WLStorage.isStaffAccess();
+		Boolean currentAA = WLStorage.isAlternateAccess();
+		Boolean currentTA = WLStorage.isTesterAccess();
+		Boolean currentOA = WLStorage.isOtherAccess();
+
+		WLStorage.setWhitelist(true);
+		WLStorage.setProjectTeamAccess(false);
+		WLStorage.setStaffAccess(false);
+		WLStorage.setTesterAccess(false);
+		WLStorage.setAlternateAccess(false);
+		WLStorage.setOtherAccess(false);
+		WLStorage.setConfigAccess(false);				
+		Utility.sendMsg(snd, prefix + "&6Whitelist is  " + WLStorage.isWhitelisting());
+			
+		Utility.broadcast(WLStorage.getBroadcastMsg());
+		Utility.sendMsg(snd, prefix + "&6Sending non-whitelisted players back to Lobby based on the status below!");
+		getStatus(snd);
+		try {
+            Thread.sleep(WLStorage.getDelayBeforeStartingKicks()*1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+		playerSendKick(snd);
+		Utility.sendMsg(snd, prefix + "&aDone sending non-whitelisted players!");
+		Utility.sendMsg(snd, prefix + "&cIf players are still connected, check the Whitelist settings.");
+
+		WLStorage.setWhitelist(currentWL);
+		WLStorage.setProjectTeamAccess(currentPA);
+		WLStorage.setStaffAccess(currentSA);
+		WLStorage.setTesterAccess(currentTA);
+		WLStorage.setAlternateAccess(currentAA);
+		WLStorage.setOtherAccess(currentOA);
+		WLStorage.setConfigAccess(currentCA);
+		
+		Bukkit.shutdown();
+	}
+	
+	static void playerSendKick(CommandSender snd) {
 		Integer playersCount = 0;
 		Integer playersPerms = 0;
 		Integer playersSent = 0;
@@ -622,7 +608,7 @@ public class WLCmd implements CommandExecutor {
 			Player p = player;
 			String pname = p.getName();
 			playersCount++;
-			if (this.m.getEvent().permCheck(p)) {
+			if (WLEvent.permCheck(p)) {
 				playersPerms++;
 				playerList = playerList + pname + " ";
 				continue;
@@ -638,7 +624,7 @@ public class WLCmd implements CommandExecutor {
 					e.printStackTrace();
 				}
 				Utility.sendMsg(p, prefix + WLStorage.getSendMsg());
-				p.sendPluginMessage(this.m, "BungeeCord", bout.toByteArray());
+				p.sendPluginMessage(m, "BungeeCord", bout.toByteArray());
 
 				try {
 		            Thread.sleep(WLStorage.getKickDelayPerPlayer() * 1000);
@@ -669,8 +655,47 @@ public class WLCmd implements CommandExecutor {
 		}
 	}
 	
+	static void removePlayer(CommandSender snd, String[] args) {
+
+		if (args.length < 2) {
+			Utility.sendMsg(snd, "&7Please input a name!");
+			return;
+		}
+		names = args[1];
+		WLStorage.removeWhitelist(names);
+		Utility.sendMsg(snd, prefix + "Whitelist removed for &c" + names);
+	}
 	
-	String msgOnly(String[] args) {
+	static void addPlayer (CommandSender snd, String[] args) {
+		if (args.length < 2) {
+			Utility.sendMsg(snd, "&7Please input a name!");
+			return;
+		}
+
+		names = args[1];
+		WLStorage.addWhitelist(names);
+		Utility.sendMsg(snd, prefix + "Whitelisted &a" + names);
+	}
+	
+	static void listPlayers (CommandSender snd) {
+		names = "";
+
+		String str;
+		for (Iterator<String> var6 = WLStorage.getWhiteLists().iterator(); var6
+				.hasNext(); names = names + str + "&e&l, &7") {
+			str = (String) var6.next();
+		}
+
+		Utility.sendMsg(snd, "&a&lWhitelisted: &7" + names);
+	}
+	
+	static void resetList () {
+		for (String n : WLStorage.getWhiteLists()) {
+			WLStorage.removeWhitelist(n);
+		}
+	}
+	
+	static String msgOnly(String[] args) {
 		String msg = "";
 		int i;
 		for (i=1; i< args.length;i++) {
@@ -679,7 +704,7 @@ public class WLCmd implements CommandExecutor {
 		return msg;
 	}
 	
-	void getStatus(CommandSender snd) {
+	static void getStatus(CommandSender snd) {
 		Utility.sendMsg(snd, "&a&lWhitelist Status &7>");
 		Utility.sendMsg(snd, "&e> &7Use &a&l/awl help &r&7for commands list.");
 		Utility.sendMsg(snd, "&e> &7Use &a&l/awl msgs &r&7for Messages list.");
@@ -699,7 +724,7 @@ public class WLCmd implements CommandExecutor {
 		Utility.sendMsg(snd, "&e> &7Delay time between player being kicked and checked: &e" + WLStorage.getKickDelayPerPlayer() + " Seconds");
 	}
 	
-	void getMsgs(CommandSender snd) {
+	static void getMsgs(CommandSender snd) {
 
 		Utility.sendMsg(snd, "&e> &7Not Whitelisted message: &e" + WLStorage.getNotWhitelistMsg());
 		Utility.sendMsg(snd, "&e> &7");
@@ -710,7 +735,7 @@ public class WLCmd implements CommandExecutor {
 		Utility.sendMsg(snd, "&e> &7Message sent to player when a player is kicked from the network: &e" + WLStorage.getKickMsg());
 	}
 	
-	void HelpMenu(CommandSender snd) {
+	static void HelpMenu(CommandSender snd) {
 		Utility.sendMsg(snd, "&e> &7/awl &bhelp 1 - Base Help commands");
 		Utility.sendMsg(snd, "&e> &7/awl &bhelp 2-3 - For more commands");
 		Utility.sendMsg(snd, "&e> &7/awl &bhelp 4 - For more specific permissions");
@@ -718,8 +743,8 @@ public class WLCmd implements CommandExecutor {
 	}
 	
 	
-	void getHelp(CommandSender snd, String[] args) {
-		this.HelpMenu(snd);
+	static void getHelp(CommandSender snd, String[] args) {
+		WLCmd.HelpMenu(snd);
 		
 		if (args.length < 2 || args[1].equals("1")) {
 			Utility.sendMsg(snd, "&e> &7/awl &bstatus/info");

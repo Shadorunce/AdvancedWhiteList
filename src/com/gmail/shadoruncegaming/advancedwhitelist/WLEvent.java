@@ -38,7 +38,7 @@ public class WLEvent implements Listener {
 				}
 			}
 			if (WLStorage.isWhitelisting()) {
-				if (this.permCheck(p)) return;
+				if (WLEvent.permCheck(p)) return;
 /*				if (p.hasPermission("AdvancedWhiteList.Bypass.Operator") || p.hasPermission("AdvancedWhiteList.Bypass.Operators")) {return;}
 				if (this.m.getStorage().isConfigAccess() == true && m.getStorage().isWhitelisted(p.getName()))  {return;}
 				if (this.m.getStorage().isProjectTeamAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.ProjectTeam")) {return;}
@@ -52,7 +52,7 @@ public class WLEvent implements Listener {
 			}
 		}
 	}
-		boolean permCheck(Player p) {
+		static boolean permCheck(Player p) {
 			if (p.hasPermission("AdvancedWhiteList.Bypass.Operator") || p.hasPermission("AdvancedWhiteList.Bypass.Operators")) {return true;}
 			if (WLStorage.isConfigAccess() == true && WLStorage.isWhitelisted(p.getName()))  {return true;}
 			if (WLStorage.isProjectTeamAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.ProjectTeam")) {return true;}

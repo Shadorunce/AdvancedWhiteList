@@ -29,12 +29,16 @@ public class WLGui implements Listener {
 	static String intClick3 = "§6Middle click material to type amount.";
 	static String msgClick = "§6Left Click material to type a new text.";
 	static String msgClick2 = "§6Right Click material to view the full message in chat.";
+	static String cmdClick = "§6Click to run command function";
+	static String cmdClickConf = "§cShift Right-Click to run command function";
 	static String title = ChatColor.GOLD + "Advanced" + ChatColor.GREEN + "WhiteList";
 	
     // You can call this whenever you want to put the items in
     public static void initializeItems()
     {
-		inv = Bukkit.createInventory(null, 27, WLGui.title);
+    	// 0-8 | 9-17 | 18-26 | 27-35 | (36-44) | 45-53
+    	int rows = 4;
+		inv = Bukkit.createInventory(null, rows*9, WLGui.title);
     	
     	WLStorage.reload();
         
@@ -55,26 +59,32 @@ public class WLGui implements Listener {
         inv.setItem(6,createGuiItem(getGUIMat(WLStorage.isOtherAccess()), "§eOther Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isOtherAccess()), tfClick));
         inv.setItem(7,createGuiItem(getGUIMat(WLStorage.isServerCooldown()), "§eServer Cooldown Enabled", "§eEnabled: " + getTFColor(WLStorage.isServerCooldown()), tfClick));
         // Messages
-        int maxSize = 50;
+        int maxSize = 40;
         String string;
-        Utility.broadcast(numToString(WLStorage.getBroadcastMsg().length()));
         string = WLStorage.getNotWhitelistMsg();
-        if (WLStorage.getNotWhitelistMsg().length() > maxSize) string = WLStorage.getNotWhitelistMsg().substring(0, maxSize);
+        if (WLStorage.getNotWhitelistMsg().length() > maxSize) string = WLStorage.getNotWhitelistMsg().substring(0, maxSize-1) + "[...]";
         inv.setItem(9,createGuiItem(Material.MAGENTA_STAINED_GLASS_PANE, "§eNot Whitelisted Message", "§eMessage: " + string, msgClick, msgClick2));
         string = WLStorage.getBroadcastMsg();
-        if (WLStorage.getNotWhitelistMsg().length() > maxSize) string = WLStorage.getBroadcastMsg().substring(0, maxSize);
+        if (WLStorage.getNotWhitelistMsg().length() > maxSize) string = WLStorage.getBroadcastMsg().substring(0, maxSize-1) + "[...]";
         inv.setItem(10,createGuiItem(Material.YELLOW_STAINED_GLASS_PANE, "§eBroadcast Message before sending players", "§eMessage: " + string, msgClick, msgClick2));
         string = WLStorage.getSendMsg();
-        if (WLStorage.getNotWhitelistMsg().length() > maxSize) string = WLStorage.getSendMsg().substring(0, maxSize);
+        if (WLStorage.getNotWhitelistMsg().length() > maxSize) string = WLStorage.getSendMsg().substring(0, maxSize-1) + "[...]";
         inv.setItem(11,createGuiItem(Material.WHITE_STAINED_GLASS_PANE, "§eMessage sent before sending player", "§eMessage: " + string, msgClick, msgClick2));
         string = WLStorage.getKickMsg();
-        if (WLStorage.getNotWhitelistMsg().length() > maxSize) string = WLStorage.getKickMsg().substring(0, maxSize);
-        inv.setItem(12,createGuiItem(Material.PINK_STAINED_GLASS_PANE, "§eMessage sent if player gets kicked", "§eMessage: " + string, msgClick, msgClick2));
+        if (WLStorage.getNotWhitelistMsg().length() > maxSize) string = WLStorage.getKickMsg().substring(0, maxSize-1) + "[...]";
+        inv.setItem(12,createGuiItem(Material.BROWN_STAINED_GLASS_PANE, "§eMessage sent if player gets kicked", "§eMessage: " + string, msgClick, msgClick2));
         inv.setItem(13,createGuiItem(Material.ORANGE_STAINED_GLASS_PANE, "§eMessage sent if player gets kicked", "§eServer: §6" + WLStorage.getHubServer(), msgClick, "Refer to Bungee server settings to find Hub/Lobby name."));
         // Durations
         inv.setItem(18,createGuiItem(Material.BLUE_STAINED_GLASS_PANE, "§eServer Cooldown Duration", "§eDuration: §b" + WLStorage.getServerCooldown(), intClick1, intClick2, intClick3));
         inv.setItem(19,createGuiItem(Material.CYAN_STAINED_GLASS_PANE, "§eDelay Before Starting Kicks", "§eDuration: §b" + WLStorage.getDelayBeforeStartingKicks(), intClick1, intClick2, intClick3));
         inv.setItem(20,createGuiItem(Material.LIGHT_BLUE_STAINED_GLASS_PANE, "§eKick Delay Per Player", "§eDuration: §b" + WLStorage.getKickDelayPerPlayer(), intClick1, intClick2, intClick3));
+        // Commands
+        inv.setItem(27,createGuiItem(Material.LIME_STAINED_GLASS_PANE, ChatColor.DARK_GREEN + "Add player to Config Access List", cmdClick));
+        inv.setItem(28,createGuiItem(Material.PINK_STAINED_GLASS_PANE, ChatColor.DARK_RED + "Remove player from Config Access List", cmdClick));
+        inv.setItem(29,createGuiItem(Material.PURPLE_STAINED_GLASS_PANE, "§bShow Config Access List", ChatColor.DARK_BLUE + "Get the Config Access List in chat.", cmdClick));
+        inv.setItem(33,createGuiItem(Material.GRAY_STAINED_GLASS_PANE, ChatColor.DARK_RED + "Reset Config Access List", "Remove all names from the Config Access List", cmdClickConf));
+        inv.setItem(34,createGuiItem(Material.BARRIER, "§cSend Players to lobby", ChatColor.DARK_RED + "  Only if WhiteList is on,", ChatColor.DARK_RED + "  only sends non-whitelisted players.", cmdClickConf));
+        inv.setItem(35,createGuiItem(Material.BARRIER, "§cRestart the server", ChatColor.DARK_RED + "This will send players back to lobby first.", cmdClickConf));
         
     }
 
@@ -136,7 +146,12 @@ public class WLGui implements Listener {
     			// Boolean
     			if (name.contains("Whitelist Enabled")) {
     				WLStorage.setWhitelist(getTF(WLStorage.isWhitelisting()));
-    				inv.setItem(0,createGuiItem(getGUIMat(WLStorage.isWhitelisting()), "§6Whitelist Enabled", "§eEnabled: " + getTFColor(WLStorage.isWhitelisting()), WLGui.tfClick));
+    				inv.setItem(0,createGuiItem(getGUIMat(WLStorage.isWhitelisting()), "§6Whitelist Enabled", "§eEnabled: " + getTFColor(WLStorage.isWhitelisting()), WLGui.tfClick));// Filler
+    		    	for (Integer i = 0 ; i < inv.getSize() ; i++) {
+    		    		if (inv.getItem(i).getItemMeta().getDisplayName().contains("AWL on")) {
+    		    			inv.setItem(i,createGuiItem(Material.BLACK_STAINED_GLASS_PANE, ChatColor.GOLD + "AWL on: " + getTFColor(WLStorage.isWhitelisting())));
+    		        	}
+    		        }
     			}
     			if (name.contains("Config Access Enabled")) {
     				WLStorage.setConfigAccess(getTF(WLStorage.isConfigAccess()));
@@ -256,6 +271,26 @@ public class WLGui implements Listener {
 					};
     		        inv.setItem(20,createGuiItem(Material.LIGHT_BLUE_STAINED_GLASS_PANE, "§eKick Delay Per Player", "§eDuration: §b" + WLStorage.getKickDelayPerPlayer(), intClick1, intClick2, intClick3));
     			}
+    			
+    			// Commands
+    			if (name.contains("Add player to Config Access List")) {
+	    			msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("/awl add <name>").create()));
+	    			msg.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/awl add <name>"));
+	    			p.spigot().sendMessage(msg);
+    			}
+    			if (name.contains("Remove player from Config Access List")) {
+	    			msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("/awl remove <name>").create()));
+	    			msg.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/awl remove <name>"));
+	    			p.spigot().sendMessage(msg);
+    			}
+    			if (name.contains("Show Config Access List")) WLCmd.listPlayers(p);
+    			// Caution commands
+    			if (name.contains("Reset Config Access List")) if (e.isRightClick()) if (e.isShiftClick()) {
+    				WLCmd.resetList();
+    				Utility.sendMsg(p, "All player names have been removed from Config Access List.");
+    			}
+    			if (name.contains("Send Players to lobby")) if (e.isRightClick()) if (e.isShiftClick()) WLCmd.sendPlayers(p);
+    			if (name.contains("Restart the server")) if (e.isRightClick()) if (e.isShiftClick()) WLCmd.restartServer(p);
     		}
     	}
         return;
