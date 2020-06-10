@@ -53,7 +53,7 @@ public class WLCmd implements CommandExecutor {
 	}
 
 
-	private void remanage(CommandSender snd, String[] args) {
+	private void remanage(CommandSender snd, final String[] args) {
 		Long time;
 		String cmd = args[0].toLowerCase();
 		
@@ -82,7 +82,9 @@ public class WLCmd implements CommandExecutor {
 			case "help":
 			case "h":
 			case "?":
-				getHelp(snd,args);
+				String arg = "1";
+				if (args.length < 2) arg = args[1];
+				getHelp(snd,arg);
 				return;
 				
 				
@@ -121,7 +123,7 @@ public class WLCmd implements CommandExecutor {
 			case "listclear":
 			case "removeall":
 			case "rall":
-				resetList();
+				WLStorage.clearWhiteLists();
 				return;
 			
 			case "whitelist":
@@ -692,6 +694,7 @@ public class WLCmd implements CommandExecutor {
 	static void resetList () {
 		for (String n : WLStorage.getWhiteLists()) {
 			WLStorage.removeWhitelist(n);
+			
 		}
 	}
 	
@@ -742,11 +745,14 @@ public class WLCmd implements CommandExecutor {
 		Utility.sendMsg(snd, "&e> &7/awl &bhelp 5-9 - Command Aliases");
 	}
 	
+	static void getHelp(CommandSender snd) {
+		getHelp(snd,"1");
+	}
 	
-	static void getHelp(CommandSender snd, String[] args) {
+	
+	static void getHelp(CommandSender snd, String arg) {
 		WLCmd.HelpMenu(snd);
-		
-		if (args.length < 2 || args[1].equals("1")) {
+		if (arg.equals("1")) {
 			Utility.sendMsg(snd, "&e> &7/awl &bstatus/info");
 			Utility.sendMsg(snd, "&e> &7/awl &bmessages - ");
 			Utility.sendMsg(snd, "&e> &7/awl &aadd/remove &f<name>");
@@ -759,7 +765,7 @@ public class WLCmd implements CommandExecutor {
 			return;
 		}
 		
-		if (args[1].equals("2")) {
+		if (arg.equals("2")) {
 			Utility.sendMsg(snd, "&e> &7/awl &bscdon&7/&8scdoff &e- Server start to player login cooldown");
 			Utility.sendMsg(snd, "&e> &7/awl &bscdtime <seconds>");
 			Utility.sendMsg(snd, "&e> &7/awl &bnotwlmsg <message> &e- Msg sent to the player if they aren't whitelisted for a server.");
@@ -771,7 +777,7 @@ public class WLCmd implements CommandExecutor {
 			Utility.sendMsg(snd, "&e> &7/awl &bkickdelay <seconds> &e- Amount of time between attempting to send a player before checking if kick is needed, also delay per kicked player to not overload bungee server.");
 			return;
 		}
-		if (args[1].equals("3")) {
+		if (arg.equals("3")) {
 			Utility.sendMsg(snd, "&e> &7Access Commands: &aAdvancedWhiteList.Bypass.&b<Role>");
 			Utility.sendMsg(snd, "&e> Whitelist: &7/awl <wlon/on or wloff/off &f- &bOperators");
 			Utility.sendMsg(snd, "&e> ProjectTeamAccess: &7/awl <ptaon/ptaoff> &f- &bProjectTeam");
@@ -785,7 +791,7 @@ public class WLCmd implements CommandExecutor {
 			return;
 		}
 
-		if (args[1].equals("4")) {
+		if (arg.equals("4")) {
 			Utility.sendMsg(snd, "&e> &7Permissions:");
 			Utility.sendMsg(snd, "&e> &7Command access: &6AdvancedWhiteList.Admin");
 			Utility.sendMsg(snd, "&e> &7Full Whitelist Bypass: &6AdvancedWhiteList.Bypass.&bOperators");
@@ -797,7 +803,7 @@ public class WLCmd implements CommandExecutor {
 			return;
 		}
 
-		if (args[1].equals("5")) {
+		if (arg.equals("5")) {
 			Utility.sendMsg(snd, "&e> advancedwhitelist, advancedwl, awhitelist, advwl, awl, whitelist, wl, wlist");
 			Utility.sendMsg(snd, "&e> status, s, info, inf, in, i");
 			Utility.sendMsg(snd, "&e> messages, message, msgs, msg");
@@ -809,7 +815,7 @@ public class WLCmd implements CommandExecutor {
 			Utility.sendMsg(snd, "&e> resetlist, reset, listreset, clearlist, listclear, removeall, rall");
 			return;
 		}
-		if (args[1].equals("6")) {
+		if (arg.equals("6")) {
 			Utility.sendMsg(snd, "&e> whitelist, wl");
 			Utility.sendMsg(snd, "&e> whiteliston, wlon, on");
 			Utility.sendMsg(snd, "&e> whitelistoff, fullblockoff, wloff, off, of");
@@ -820,7 +826,7 @@ public class WLCmd implements CommandExecutor {
 			return;
 		}
 
-		if (args[1].equals("7")) {
+		if (arg.equals("7")) {
 			Utility.sendMsg(snd, "&e> setlobby, sethub, lobby, hub, lobbyserver, hubserver, server");
 			Utility.sendMsg(snd, "&e> senddelay, startdelay, sd");
 			Utility.sendMsg(snd, "&e> kickdelay, perplayerdelay, ppd, pd, kd");
@@ -831,7 +837,7 @@ public class WLCmd implements CommandExecutor {
 			return;
 		}
 
-		if (args[1].equals("8")) {
+		if (arg.equals("8")) {
 			Utility.sendMsg(snd, "&e> projectteamaccess, projectteam, pta");
 			Utility.sendMsg(snd, "&e> projectteamon, projecton, teamon, ptaon, pon");
 			Utility.sendMsg(snd, "&e> projectteamoff, projectoff, teamoff, ptaoff, poff");
@@ -844,7 +850,7 @@ public class WLCmd implements CommandExecutor {
 			return;
 		}
 
-		if (args[1].equals("9")) {
+		if (arg.equals("9")) {
 			Utility.sendMsg(snd, "&e> alternateaccess, aa");
 			Utility.sendMsg(snd, "&e> alternateon, alteon, aaon, aon");
 			Utility.sendMsg(snd, "&e> alternateoff, altoff, aaoff, aoff");

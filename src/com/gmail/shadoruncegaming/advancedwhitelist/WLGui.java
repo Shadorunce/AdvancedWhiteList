@@ -32,13 +32,16 @@ public class WLGui implements Listener {
 	static String cmdClick = "§6Click to run command function";
 	static String cmdClickConf = "§cShift Right-Click to run command function";
 	static String title = ChatColor.GOLD + "Advanced" + ChatColor.GREEN + "WhiteList";
+	static int slots;
 	
     // You can call this whenever you want to put the items in
     public static void initializeItems()
     {
-    	// 0-8 | 9-17 | 18-26 | 27-35 | (36-44) | 45-53
+    	// 0-8 | 9-17 | 18-26 | (27-35) | 36-44 | 45-53
     	int rows = 4;
-		inv = Bukkit.createInventory(null, rows*9, WLGui.title);
+    	slots = rows*9;
+		inv = Bukkit.createInventory(null, slots, WLGui.title);
+		String perm = "§6Bypass permission: §dAdvancedWhiteList.bypass.";
     	
     	WLStorage.reload();
         
@@ -50,13 +53,13 @@ public class WLGui implements Listener {
     	// CreateGuiItem(Material, title, lore....)
     	// getGuiMat(determine material based on other variable)
     	// Enabled?
-        inv.setItem(0,createGuiItem(getGUIMat(WLStorage.isWhitelisting()), "§6Whitelist Enabled", "§eEnabled: " + getTFColor(WLStorage.isWhitelisting()), tfClick));
+        inv.setItem(0,createGuiItem(getGUIMat(WLStorage.isWhitelisting()), "§6Whitelist Enabled", "§eEnabled: " + getTFColor(WLStorage.isWhitelisting()), tfClick, perm + "operator"));
         inv.setItem(1,createGuiItem(getGUIMat(WLStorage.isConfigAccess()), "§eConfig Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isConfigAccess()), tfClick));
-        inv.setItem(2,createGuiItem(getGUIMat(WLStorage.isProjectTeamAccess()), "§eProjectTeam Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isProjectTeamAccess()), tfClick));
-        inv.setItem(3,createGuiItem(getGUIMat(WLStorage.isStaffAccess()), "§eStaff Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isStaffAccess()), tfClick));
-        inv.setItem(4,createGuiItem(getGUIMat(WLStorage.isTesterAccess()), "§eTester Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isTesterAccess()), tfClick));
-        inv.setItem(5,createGuiItem(getGUIMat(WLStorage.isAlternateAccess()), "§eAlternate Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isAlternateAccess()), tfClick));
-        inv.setItem(6,createGuiItem(getGUIMat(WLStorage.isOtherAccess()), "§eOther Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isOtherAccess()), tfClick));
+        inv.setItem(2,createGuiItem(getGUIMat(WLStorage.isProjectTeamAccess()), "§eProjectTeam Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isProjectTeamAccess()), tfClick, perm + "ProjectTeam"));
+        inv.setItem(3,createGuiItem(getGUIMat(WLStorage.isStaffAccess()), "§eStaff Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isStaffAccess()), tfClick, perm + "Staff"));
+        inv.setItem(4,createGuiItem(getGUIMat(WLStorage.isTesterAccess()), "§eTester Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isTesterAccess()), tfClick, perm + "Tester"));
+        inv.setItem(5,createGuiItem(getGUIMat(WLStorage.isAlternateAccess()), "§eAlternate Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isAlternateAccess()), tfClick, perm + "Alternate"));
+        inv.setItem(6,createGuiItem(getGUIMat(WLStorage.isOtherAccess()), "§eOther Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isOtherAccess()), tfClick, perm + "Other"));
         inv.setItem(7,createGuiItem(getGUIMat(WLStorage.isServerCooldown()), "§eServer Cooldown Enabled", "§eEnabled: " + getTFColor(WLStorage.isServerCooldown()), tfClick));
         // Messages
         int maxSize = 40;
@@ -79,13 +82,32 @@ public class WLGui implements Listener {
         inv.setItem(19,createGuiItem(Material.CYAN_STAINED_GLASS_PANE, "§eDelay Before Starting Kicks", "§eDuration: §b" + WLStorage.getDelayBeforeStartingKicks(), intClick1, intClick2, intClick3));
         inv.setItem(20,createGuiItem(Material.LIGHT_BLUE_STAINED_GLASS_PANE, "§eKick Delay Per Player", "§eDuration: §b" + WLStorage.getKickDelayPerPlayer(), intClick1, intClick2, intClick3));
         // Commands
-        inv.setItem(27,createGuiItem(Material.LIME_STAINED_GLASS_PANE, ChatColor.DARK_GREEN + "Add player to Config Access List", cmdClick));
-        inv.setItem(28,createGuiItem(Material.PINK_STAINED_GLASS_PANE, ChatColor.DARK_RED + "Remove player from Config Access List", cmdClick));
-        inv.setItem(29,createGuiItem(Material.PURPLE_STAINED_GLASS_PANE, "§bShow Config Access List", ChatColor.DARK_BLUE + "Get the Config Access List in chat.", cmdClick));
+        //help
+        inv.setItem(27,createGuiItem(Material.LIME_STAINED_GLASS_PANE, ChatColor.GOLD + "Help Menu", cmdClick, ChatColor.GOLD + "Right Click for command text to see other help menus"));
+        //status
+        inv.setItem(28,createGuiItem(Material.LIME_STAINED_GLASS_PANE, 
+        		ChatColor.GOLD + "Whitelist Status", 
+        		"§6Click material to get WL Status in chat", 
+        		"§6Whitelist Enabled:" + getTFColor(WLStorage.isWhitelisting()), 
+        		"§6Config Access Enabled:" + getTFColor(WLStorage.isConfigAccess()), 
+        		"§6ProjectTeam Access Enabled:" + getTFColor(WLStorage.isProjectTeamAccess()), 
+        		"§6Staff Access Enabled:" + getTFColor(WLStorage.isStaffAccess()), 
+        		"§6Tester Access Enabled:" + getTFColor(WLStorage.isTesterAccess()), 
+        		"§6Alternate Acccess Enabled:" + getTFColor(WLStorage.isAlternateAccess()),
+        		"§6Other Access Enabled:" + getTFColor(WLStorage.isOtherAccess()),
+        		"§6Server Cooldown Enabled:" + getTFColor(WLStorage.isServerCooldown()),
+        		"§6Server Cooldown time:" + getTFColor(WLStorage.isWhitelisting()),
+        		"§6Delay Before Starting Kicks:" + getTFColor(WLStorage.isWhitelisting()),
+        		"§6Kick Delay Per Player:" + getTFColor(WLStorage.isWhitelisting())
+        		));
+        
+        inv.setItem(29,createGuiItem(Material.LIME_STAINED_GLASS_PANE, ChatColor.DARK_GREEN + "Add player to Config Access List", cmdClick));
+        inv.setItem(30,createGuiItem(Material.PINK_STAINED_GLASS_PANE, ChatColor.DARK_RED + "Remove player from Config Access List", cmdClick));
+        inv.setItem(31,createGuiItem(Material.PURPLE_STAINED_GLASS_PANE, "§bShow Config Access List", ChatColor.DARK_BLUE + "Get the Config Access List in chat.", cmdClick));
         inv.setItem(33,createGuiItem(Material.GRAY_STAINED_GLASS_PANE, ChatColor.DARK_RED + "Reset Config Access List", "Remove all names from the Config Access List", cmdClickConf));
         inv.setItem(34,createGuiItem(Material.BARRIER, "§cSend Players to lobby", ChatColor.DARK_RED + "  Only if WhiteList is on,", ChatColor.DARK_RED + "  only sends non-whitelisted players.", cmdClickConf));
         inv.setItem(35,createGuiItem(Material.BARRIER, "§cRestart the server", ChatColor.DARK_RED + "This will send players back to lobby first.", cmdClickConf));
-        
+
     }
 
     
@@ -141,7 +163,7 @@ public class WLGui implements Listener {
         Player p = (Player) e.getWhoClicked();
 		e.setCancelled(true);
     	if (ChatColor.translateAlternateColorCodes('&', e.getView().getTitle()).equals(WLGui.title)) {
-    		if (e.getCurrentItem() != null) {
+    		if (e.getCurrentItem() != null) if (e.getSlot() < slots) {
     			String name = e.getCurrentItem().getItemMeta().getDisplayName();
     			// Boolean
     			if (name.contains("Whitelist Enabled")) {
@@ -157,7 +179,7 @@ public class WLGui implements Listener {
     				WLStorage.setConfigAccess(getTF(WLStorage.isConfigAccess()));
     		        inv.setItem(1,createGuiItem(getGUIMat(WLStorage.isConfigAccess()), "§eConfig Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isConfigAccess()), tfClick));
     			}
-    			if (name.contains("ProjectTeam Access Enabled")) {
+    			if (name.contains("ProjectTeam Access Enabled"))  {
     				WLStorage.setProjectTeamAccess(getTF(WLStorage.isProjectTeamAccess()));
     		        inv.setItem(2,createGuiItem(getGUIMat(WLStorage.isProjectTeamAccess()), "§eProjectTeam Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isProjectTeamAccess()), tfClick));
     			}
@@ -286,7 +308,7 @@ public class WLGui implements Listener {
     			if (name.contains("Show Config Access List")) WLCmd.listPlayers(p);
     			// Caution commands
     			if (name.contains("Reset Config Access List")) if (e.isRightClick()) if (e.isShiftClick()) {
-    				WLCmd.resetList();
+    				WLStorage.clearWhiteLists();
     				Utility.sendMsg(p, "All player names have been removed from Config Access List.");
     			}
     			if (name.contains("Send Players to lobby")) if (e.isRightClick()) if (e.isShiftClick()) WLCmd.sendPlayers(p);
