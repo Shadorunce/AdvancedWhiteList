@@ -43,10 +43,11 @@
 - Added Restart option
 
 1.1.12:
-- Separated Messages from main status check.
+- Separated Messages from main status check to lessen the amount of text being sent to admin.
+- Added reset list command to clear the Whitelist list
 - Added GUI (In-progress)
 
 Future Plans:
-1) Add a summary, Put numbers instead of names for summary
-4) Added proper Config version check at start so that it will rename the old file and enter a new one with existing values for easy transfer
-5) Get Header comments to save into file.
+- Add a summary, Put numbers instead of names for summary
+- Added proper Config version check at start so that it will rename the old file and enter a new one with existing values for easy transfer
+- Get Header comments to save into file.
