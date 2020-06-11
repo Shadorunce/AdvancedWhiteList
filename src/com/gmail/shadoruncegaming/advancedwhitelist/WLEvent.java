@@ -45,14 +45,19 @@ public class WLEvent implements Listener {
 			}
 		}
 	}
-		static boolean permCheck(Player p) {
-			if (p.hasPermission("AdvancedWhiteList.Bypass.Operator") || p.hasPermission("AdvancedWhiteList.Bypass.Operators")) {return true;}
-			if (WLStorage.isConfigAccess() == true && WLStorage.isWhitelisted(p.getName()))  {return true;}
-			if (WLStorage.isProjectTeamAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.ProjectTeam")) {return true;}
-			if (WLStorage.isStaffAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.Staff")) {return true;}
-			if (WLStorage.isTesterAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.Tester")) {return true;}
-			if (WLStorage.isAlternateAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.Alternate")) {return true;}
-			if (WLStorage.isOtherAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.Other")) {return true;}
-			return false;
-		}
+	
+	static void receiveMsg(String name) {
+		
+	}
+	
+	static boolean permCheck(Player p) {
+		if (p.hasPermission("AdvancedWhiteList.Bypass.Operator") || p.hasPermission("AdvancedWhiteList.Bypass.Operators")) {return true;}
+		if (WLStorage.isConfigAccess() == true && WLStorage.isWhitelisted(p.getName()))  {return true;}
+		if (WLStorage.isProjectTeamAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.ProjectTeam")) {return true;}
+		if (WLStorage.isStaffAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.Staff")) {return true;}
+		if (WLStorage.isTesterAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.Tester")) {return true;}
+		if (WLStorage.isAlternateAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.Alternate")) {return true;}
+		if (WLStorage.isOtherAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.Other")) {return true;}
+		return false;
+	}
 }

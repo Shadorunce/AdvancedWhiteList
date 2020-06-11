@@ -60,11 +60,12 @@ public class AdvancedWhiteList extends JavaPlugin implements PluginMessageListen
 		return this.gui;
 	}
 	
+	
 	public void onPluginMessageReceived(String channel, Player player, byte[] message){
 		   if(!channel.equals("BungeeCord")){
 		     return;
 		   }
-		    ByteArrayDataInput in = ByteStreams.newDataInput(message);
+		   ByteArrayDataInput in = ByteStreams.newDataInput(message);
 		   String subchannel = in.readUTF();
 
 		   if (subchannel.contains("From BungeeCordAuthMe.v2.Broadcast") || subchannel.contains("From BungeeCordCMIPlayerFeedback")) {

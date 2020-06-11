@@ -83,7 +83,7 @@ public class WLCmd implements CommandExecutor {
 			case "h":
 			case "?":
 				String arg = "1";
-				if (args.length < 2) arg = args[1];
+				if (args.length >= 2) arg = args[1];
 				getHelp(snd,arg);
 				return;
 				
@@ -536,6 +536,10 @@ public class WLCmd implements CommandExecutor {
 				restartServer(snd);
 				return;
 				
+			case "test2":
+				sendMsg("Shadorunce");
+				return;
+				
 			case "wlgui":
 			case "gui":
 			default:
@@ -578,6 +582,7 @@ public class WLCmd implements CommandExecutor {
 		WLStorage.setConfigAccess(currentCA);
 		
 		Bukkit.shutdown();
+		
 	}
 	
 	static void sendPlayers(CommandSender snd) {
@@ -632,26 +637,38 @@ public class WLCmd implements CommandExecutor {
 		            e.printStackTrace();
 		        }
 				if (!Bukkit.getOnlinePlayers().contains(p)) {
-//					Utility.sendMsg(snd, prefix + "&eSent " + pname + " to lobby.");
 					playersSent++;
 				}
 				if (Bukkit.getOnlinePlayers().contains(p)) {
 					p.kickPlayer(WLStorage.getKickMsg());
 					playersKicked++;
-//					Utility.sendMsg(snd, prefix + "&eKicked " + pname + " as lobby wasn't available or send failed.");
 				}
 			}
 			for(@SuppressWarnings("unused") Player player2 : Bukkit.getOnlinePlayers()) {
 				playersLeft++;
 			}
-			Utility.sendMsg(snd, prefix + "&e&lSend/Kick Results:");
-			Utility.sendMsg(snd, prefix + "&6Players on server: &f" + playersCount);
-			Utility.sendMsg(snd, prefix + "&6Players sent to Lobby: &f" + playersSent);
-			Utility.sendMsg(snd, prefix + "&6Players kicked from Server: &f" + playersKicked);
-			Utility.sendMsg(snd, prefix + "&6Players on server after kick/send: &f" + playersLeft);
-			Utility.sendMsg(snd, prefix + "&6Players with Whitelist perms not kicked: &f" + playersPerms);
-			Utility.sendMsg(snd, prefix + "&6Players with perms: &f" + playerList);
-			Utility.sendMsg(snd, prefix + "&eNote: This information may not be correct, but if you send me information of what actually happened, such as what the result given was, how many were actually connected and how many were actually sent or not sent, I can attempt to troubleshoot this more. It's harder to keep testing without affecting productivity.");
+			sendMsg(pname);
+		}
+		Utility.sendMsg(snd, prefix + "&e&lSend/Kick Results:");
+		Utility.sendMsg(snd, prefix + "&6Players on server: &f" + playersCount);
+		Utility.sendMsg(snd, prefix + "&6Players sent to Lobby: &f" + playersSent);
+		Utility.sendMsg(snd, prefix + "&6Players kicked from Server: &f" + playersKicked);
+		Utility.sendMsg(snd, prefix + "&6Players on server after kick/send: &f" + playersLeft);
+		Utility.sendMsg(snd, prefix + "&6Players with Whitelist perms not kicked: &f" + playersPerms);
+		Utility.sendMsg(snd, prefix + "&6Players with perms: &f" + playerList);
+		Utility.sendMsg(snd, prefix + "&eNote: This information may not be correct, but if you send me information of what actually happened, such as what the result given was, how many were actually connected and how many were actually sent or not sent, I can attempt to troubleshoot this more. It's harder to keep testing without affecting productivity.");
+
+	}
+	
+	static void sendMsg(String pname) {
+		ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        DataOutputStream out = new DataOutputStream(bout);
+		try {
+			out.writeUTF("message");
+			out.writeUTF(pname);
+			out.writeUTF(WLStorage.getSendMsg());
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -762,9 +779,9 @@ public class WLCmd implements CommandExecutor {
 		if (arg.equals("1")) {
 			Utility.sendMsg(snd, "&e> &7/awl &bstatus/info");
 			Utility.sendMsg(snd, "&e> &7/awl &bmessages - ");
-			Utility.sendMsg(snd, "&e> &7/awl &aadd/remove &f<name>");
+			Utility.sendMsg(snd, "&e> &7/awl &aadd&7/&cremove &f<name>");
 			Utility.sendMsg(snd, "&e> &7/awl &flist");
-			Utility.sendMsg(snd, "&e> &7/awl &f(addall)players &e- Add all current players to Config Access list");
+			Utility.sendMsg(snd, "&e> &7/awl &a(addall)players &e- Add all current players to Config Access list");
 			Utility.sendMsg(snd, "&e> &7/awl &cclearlist");
 			Utility.sendMsg(snd, "&e> &7/awl &a&lon &f/ &coff");
 			Utility.sendMsg(snd, "&e> &7/awl &cwlonly/send/kick &e- Kicks players that aren't whitelisted.");
@@ -820,10 +837,11 @@ public class WLCmd implements CommandExecutor {
 			Utility.sendMsg(snd, "&e> remove, rem, re, r");
 			Utility.sendMsg(snd, "&e> add, ad, a");
 			Utility.sendMsg(snd, "&e> list, li, l");
-			Utility.sendMsg(snd, "&e> resetlist, reset, listreset, clearlist, listclear, removeall, rall");
 			return;
 		}
 		if (arg.equals("6")) {
+			Utility.sendMsg(snd, "&e> addallplayers, addallplayer, allplayers, allplayer, addplayers, addall, aall");
+			Utility.sendMsg(snd, "&e> resetlist, reset, listreset, clearlist, listclear, removeall, rall");
 			Utility.sendMsg(snd, "&e> whitelist, wl");
 			Utility.sendMsg(snd, "&e> whiteliston, wlon, on");
 			Utility.sendMsg(snd, "&e> whitelistoff, fullblockoff, wloff, off, of");
