@@ -45,7 +45,11 @@
 1.1.12:
 - Separated Messages from main status check to lessen the amount of text being sent to admin.
 - Added reset list command to clear the Whitelist list
-- Added GUI (In-progress)
+
+1.2.0
+- Added GUI
+- Added an option to Add All connected players to the Config Access List
+
 
 Future Plans:
 - Add a summary, Put numbers instead of names for summary

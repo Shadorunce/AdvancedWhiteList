@@ -39,14 +39,7 @@ public class WLEvent implements Listener {
 			}
 			if (WLStorage.isWhitelisting()) {
 				if (WLEvent.permCheck(p)) return;
-/*				if (p.hasPermission("AdvancedWhiteList.Bypass.Operator") || p.hasPermission("AdvancedWhiteList.Bypass.Operators")) {return;}
-				if (this.m.getStorage().isConfigAccess() == true && m.getStorage().isWhitelisted(p.getName()))  {return;}
-				if (this.m.getStorage().isProjectTeamAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.ProjectTeam")) {return;}
-				if (this.m.getStorage().isStaffAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.Staff")) {return;}
-				if (this.m.getStorage().isTesterAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.Tester")) {return;}
-				if (this.m.getStorage().isAlternateAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.Alternate")) {return;}
-				if (this.m.getStorage().isOtherAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.Other")) {return;}
-*/				else {
+				else {
 					e.disallow(Result.KICK_WHITELIST, WLStorage.getNotWhitelistMsg());
 				}
 			}
