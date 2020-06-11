@@ -116,6 +116,16 @@ public class WLCmd implements CommandExecutor {
 				listPlayers(snd);
 				return;
 				
+			case "addallplayers":
+			case "addallplayer":
+			case "allplayers":
+			case "allplayer":
+			case "addplayers":
+			case "addall":
+			case "aall":
+				addAllPlayers();
+				return;
+				
 			case "resetlist":
 			case "reset":
 			case "listreset":
@@ -541,23 +551,6 @@ public class WLCmd implements CommandExecutor {
 		}
 	}
 	
-	static void sendPlayers(CommandSender snd) {
-		Utility.sendMsg(snd, prefix + "&6Whitelist is  " + WLStorage.isWhitelisting());
-			if (WLStorage.isWhitelisting()) {
-				Utility.broadcast(WLStorage.getBroadcastMsg());
-				Utility.sendMsg(snd, prefix + "&6Sending non-whitelisted players back to Lobby based on the status below!");
-				getStatus(snd);
-				try {
-		            Thread.sleep(WLStorage.getDelayBeforeStartingKicks()*1000);
-		        } catch (InterruptedException e) {
-		            e.printStackTrace();
-		        }
-				playerSendKick(snd);
-				Utility.sendMsg(snd, prefix + "&aDone sending non-whitelisted players!");
-				Utility.sendMsg(snd, prefix + "&cIf players are still connected, check the Whitelist settings.");
-			}
-	}
-	
 	static void restartServer(CommandSender snd) {
 		Boolean currentWL = WLStorage.isWhitelisting();
 		Boolean currentCA = WLStorage.isConfigAccess();
@@ -574,19 +567,7 @@ public class WLCmd implements CommandExecutor {
 		WLStorage.setAlternateAccess(false);
 		WLStorage.setOtherAccess(false);
 		WLStorage.setConfigAccess(false);				
-		Utility.sendMsg(snd, prefix + "&6Whitelist is  " + WLStorage.isWhitelisting());
-			
-		Utility.broadcast(WLStorage.getBroadcastMsg());
-		Utility.sendMsg(snd, prefix + "&6Sending non-whitelisted players back to Lobby based on the status below!");
-		getStatus(snd);
-		try {
-            Thread.sleep(WLStorage.getDelayBeforeStartingKicks()*1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-		playerSendKick(snd);
-		Utility.sendMsg(snd, prefix + "&aDone sending non-whitelisted players!");
-		Utility.sendMsg(snd, prefix + "&cIf players are still connected, check the Whitelist settings.");
+		sendPlayers(snd);
 
 		WLStorage.setWhitelist(currentWL);
 		WLStorage.setProjectTeamAccess(currentPA);
@@ -597,6 +578,23 @@ public class WLCmd implements CommandExecutor {
 		WLStorage.setConfigAccess(currentCA);
 		
 		Bukkit.shutdown();
+	}
+	
+	static void sendPlayers(CommandSender snd) {
+		Utility.sendMsg(snd, prefix + "&6Whitelist is  " + WLStorage.isWhitelisting());
+			if (WLStorage.isWhitelisting()) {
+				Utility.broadcast(WLStorage.getBroadcastMsg());
+				Utility.sendMsg(snd, prefix + "&6Sending non-whitelisted players back to Lobby based on the status below!");
+				getStatus(snd);
+				try {
+		            Thread.sleep(WLStorage.getDelayBeforeStartingKicks()*1000);
+		        } catch (InterruptedException e) {
+		            e.printStackTrace();
+		        }
+				playerSendKick(snd);
+				Utility.sendMsg(snd, prefix + "&aDone sending non-whitelisted players!");
+				Utility.sendMsg(snd, prefix + "&cIf players are still connected, check the Whitelist settings.");
+			}
 	}
 	
 	static void playerSendKick(CommandSender snd) {
@@ -673,9 +671,11 @@ public class WLCmd implements CommandExecutor {
 			Utility.sendMsg(snd, "&7Please input a name!");
 			return;
 		}
-
-		names = args[1];
-		WLStorage.addWhitelist(names);
+		String names = "";
+		for (int i=1 ; i < args.length-1 ; i++) {
+			WLStorage.addWhitelist(args[i]);
+			names = names + ", " + args[i];
+		}
 		Utility.sendMsg(snd, prefix + "Whitelisted &a" + names);
 	}
 	
@@ -690,11 +690,18 @@ public class WLCmd implements CommandExecutor {
 
 		Utility.sendMsg(snd, "&a&lWhitelisted: &7" + names);
 	}
+
+	public static void addAllPlayers() {
+		String names = "";
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			WLStorage.addWhitelist(player.getName());
+			names = names + ", " + player.getName();
+		}
+	}
 	
 	static void resetList () {
 		for (String n : WLStorage.getWhiteLists()) {
 			WLStorage.removeWhitelist(n);
-			
 		}
 	}
 	
@@ -757,6 +764,7 @@ public class WLCmd implements CommandExecutor {
 			Utility.sendMsg(snd, "&e> &7/awl &bmessages - ");
 			Utility.sendMsg(snd, "&e> &7/awl &aadd/remove &f<name>");
 			Utility.sendMsg(snd, "&e> &7/awl &flist");
+			Utility.sendMsg(snd, "&e> &7/awl &f(addall)players &e- Add all current players to Config Access list");
 			Utility.sendMsg(snd, "&e> &7/awl &cclearlist");
 			Utility.sendMsg(snd, "&e> &7/awl &a&lon &f/ &coff");
 			Utility.sendMsg(snd, "&e> &7/awl &cwlonly/send/kick &e- Kicks players that aren't whitelisted.");

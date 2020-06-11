@@ -48,19 +48,10 @@
 
 1.2.0
 - Added GUI
+- Added an option to Add All connected players to the Config Access List
 
-1.2.1
-- Added GUI Button for Help
-- Added display perms in lores and clickable option that will put the permission in chat.
-- Added GUI Button to show all status as text.
 
 Future Plans:
 - Add a summary, Put numbers instead of names for summary
 - Added proper Config version check at start so that it will rename the old file and enter a new one with existing values for easy transfer
 - Get Header comments to save into file.
-- GUI:
--- Help button
--- Show perms needed for the different sections
--- Status button
---- Filler, Right click to get text version.
--- Add option to add all currently online players.

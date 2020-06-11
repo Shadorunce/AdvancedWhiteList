@@ -23,15 +23,16 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class WLGui implements Listener {
 	private static Inventory inv;
-	static String tfClick = "§6Click material to toggle §aTrue§6/§cFalse.";
-	static String intClick1 = "§6Left click material to §aIncrease. Shift for +5";
-	static String intClick2 = "§6Right click material to §bDecrease. Shift for -5";
-	static String intClick3 = "§6Middle click material to type amount.";
-	static String msgClick = "§6Left Click material to type a new text.";
-	static String msgClick2 = "§6Right Click material to view the full message in chat.";
+	static String tfClick = "§6Left Click to toggle §aTrue§6/§cFalse.";
+	static String tfClick2 = "§6Right Click to put permission in chat.";
+	static String intClick1 = "§6Left Click to §aIncrease. Shift for +5";
+	static String intClick2 = "§6Right Click to §bDecrease. Shift for -5";
+	static String intClick3 = "§6Middle Click to type amount.";
+	static String msgClick = "§6Left Click to type a new text.";
+	static String msgClick2 = "§6Right Click to view the full message in chat.";
 	static String cmdClick = "§6Click to run command function";
 	static String cmdClickConf = "§cShift Right-Click to run command function";
-	static String title = ChatColor.GOLD + "Advanced" + ChatColor.GREEN + "WhiteList";
+	static String title = "§4§lAdvanced§2§lWhiteList";
 	static int slots;
 	
     // You can call this whenever you want to put the items in
@@ -53,13 +54,13 @@ public class WLGui implements Listener {
     	// CreateGuiItem(Material, title, lore....)
     	// getGuiMat(determine material based on other variable)
     	// Enabled?
-        inv.setItem(0,createGuiItem(getGUIMat(WLStorage.isWhitelisting()), "§6Whitelist Enabled", "§eEnabled: " + getTFColor(WLStorage.isWhitelisting()), tfClick, perm + "operator"));
+        inv.setItem(0,createGuiItem(getGUIMat(WLStorage.isWhitelisting()), "§6Whitelist Enabled", "§eEnabled: " + getTFColor(WLStorage.isWhitelisting()), tfClick, tfClick2, perm + "operator"));
         inv.setItem(1,createGuiItem(getGUIMat(WLStorage.isConfigAccess()), "§eConfig Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isConfigAccess()), tfClick));
-        inv.setItem(2,createGuiItem(getGUIMat(WLStorage.isProjectTeamAccess()), "§eProjectTeam Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isProjectTeamAccess()), tfClick, perm + "ProjectTeam"));
-        inv.setItem(3,createGuiItem(getGUIMat(WLStorage.isStaffAccess()), "§eStaff Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isStaffAccess()), tfClick, perm + "Staff"));
-        inv.setItem(4,createGuiItem(getGUIMat(WLStorage.isTesterAccess()), "§eTester Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isTesterAccess()), tfClick, perm + "Tester"));
-        inv.setItem(5,createGuiItem(getGUIMat(WLStorage.isAlternateAccess()), "§eAlternate Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isAlternateAccess()), tfClick, perm + "Alternate"));
-        inv.setItem(6,createGuiItem(getGUIMat(WLStorage.isOtherAccess()), "§eOther Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isOtherAccess()), tfClick, perm + "Other"));
+        inv.setItem(2,createGuiItem(getGUIMat(WLStorage.isProjectTeamAccess()), "§eProjectTeam Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isProjectTeamAccess()), tfClick, tfClick2, perm + "ProjectTeam"));
+        inv.setItem(3,createGuiItem(getGUIMat(WLStorage.isStaffAccess()), "§eStaff Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isStaffAccess()), tfClick, tfClick2, perm + "Staff"));
+        inv.setItem(4,createGuiItem(getGUIMat(WLStorage.isTesterAccess()), "§eTester Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isTesterAccess()), tfClick, tfClick2, perm + "Tester"));
+        inv.setItem(5,createGuiItem(getGUIMat(WLStorage.isAlternateAccess()), "§eAlternate Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isAlternateAccess()), tfClick, tfClick2, perm + "Alternate"));
+        inv.setItem(6,createGuiItem(getGUIMat(WLStorage.isOtherAccess()), "§eOther Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isOtherAccess()), tfClick, tfClick2, perm + "Other"));
         inv.setItem(7,createGuiItem(getGUIMat(WLStorage.isServerCooldown()), "§eServer Cooldown Enabled", "§eEnabled: " + getTFColor(WLStorage.isServerCooldown()), tfClick));
         // Messages
         int maxSize = 40;
@@ -82,37 +83,32 @@ public class WLGui implements Listener {
         inv.setItem(19,createGuiItem(Material.CYAN_STAINED_GLASS_PANE, "§eDelay Before Starting Kicks", "§eDuration: §b" + WLStorage.getDelayBeforeStartingKicks(), intClick1, intClick2, intClick3));
         inv.setItem(20,createGuiItem(Material.LIGHT_BLUE_STAINED_GLASS_PANE, "§eKick Delay Per Player", "§eDuration: §b" + WLStorage.getKickDelayPerPlayer(), intClick1, intClick2, intClick3));
         // Commands
-        //help
-        inv.setItem(27,createGuiItem(Material.LIME_STAINED_GLASS_PANE, ChatColor.GOLD + "Help Menu", cmdClick, ChatColor.GOLD + "Right Click for command text to see other help menus"));
-        //status
-        inv.setItem(28,createGuiItem(Material.LIME_STAINED_GLASS_PANE, 
+        	//help
+        inv.setItem(27,createGuiItem(Material.ORANGE_STAINED_GLASS_PANE, ChatColor.GOLD + "Help Menu", cmdClick, ChatColor.GOLD + "Right Click for command text to see other help menus"));
+        	//status
+        inv.setItem(28,createGuiItem(Material.CYAN_STAINED_GLASS_PANE, 
         		ChatColor.GOLD + "Whitelist Status", 
-        		"§6Click material to get WL Status in chat", 
-        		"§6Whitelist Enabled:" + getTFColor(WLStorage.isWhitelisting()), 
-        		"§6Config Access Enabled:" + getTFColor(WLStorage.isConfigAccess()), 
-        		"§6ProjectTeam Access Enabled:" + getTFColor(WLStorage.isProjectTeamAccess()), 
-        		"§6Staff Access Enabled:" + getTFColor(WLStorage.isStaffAccess()), 
-        		"§6Tester Access Enabled:" + getTFColor(WLStorage.isTesterAccess()), 
-        		"§6Alternate Acccess Enabled:" + getTFColor(WLStorage.isAlternateAccess()),
-        		"§6Other Access Enabled:" + getTFColor(WLStorage.isOtherAccess()),
-        		"§6Server Cooldown Enabled:" + getTFColor(WLStorage.isServerCooldown()),
-        		"§6Server Cooldown time:" + getTFColor(WLStorage.isWhitelisting()),
-        		"§6Delay Before Starting Kicks:" + getTFColor(WLStorage.isWhitelisting()),
-        		"§6Kick Delay Per Player:" + getTFColor(WLStorage.isWhitelisting())
+        		"§dClick to get WL Status in chat", 
+        		"§6Whitelist Enabled: " + getTFColor(WLStorage.isWhitelisting()), 
+        		"§6Config Access Enabled: " + getTFColor(WLStorage.isConfigAccess()), 
+        		"§6ProjectTeam Access Enabled: " + getTFColor(WLStorage.isProjectTeamAccess()), 
+        		"§6Staff Access Enabled: " + getTFColor(WLStorage.isStaffAccess()), 
+        		"§6Tester Access Enabled: " + getTFColor(WLStorage.isTesterAccess()), 
+        		"§6Alternate Acccess Enabled: " + getTFColor(WLStorage.isAlternateAccess()),
+        		"§6Other Access Enabled: " + getTFColor(WLStorage.isOtherAccess()),
+        		"§6Server Cooldown Enabled: " + getTFColor(WLStorage.isServerCooldown()),
+        		"§6Server Cooldown time: " + getTFColor(WLStorage.isWhitelisting()),
+        		"§6Delay Before Starting Kicks: " + getTFColor(WLStorage.isWhitelisting()),
+        		"§6Kick Delay Per Player: " + getTFColor(WLStorage.isWhitelisting())
         		));
-        
         inv.setItem(29,createGuiItem(Material.LIME_STAINED_GLASS_PANE, ChatColor.DARK_GREEN + "Add player to Config Access List", cmdClick));
         inv.setItem(30,createGuiItem(Material.PINK_STAINED_GLASS_PANE, ChatColor.DARK_RED + "Remove player from Config Access List", cmdClick));
         inv.setItem(31,createGuiItem(Material.PURPLE_STAINED_GLASS_PANE, "§bShow Config Access List", ChatColor.DARK_BLUE + "Get the Config Access List in chat.", cmdClick));
-        inv.setItem(33,createGuiItem(Material.GRAY_STAINED_GLASS_PANE, ChatColor.DARK_RED + "Reset Config Access List", "Remove all names from the Config Access List", cmdClickConf));
+        inv.setItem(32,createGuiItem(Material.WHITE_STAINED_GLASS_PANE, ChatColor.DARK_GREEN + "Add everyone to Config Access", "§dAdd everyone currently connected.", cmdClickConf));
+        inv.setItem(33,createGuiItem(Material.RED_STAINED_GLASS_PANE, ChatColor.DARK_RED + "Reset Config Access List", "Remove all names from the Config Access List", cmdClickConf));
         inv.setItem(34,createGuiItem(Material.BARRIER, "§cSend Players to lobby", ChatColor.DARK_RED + "  Only if WhiteList is on,", ChatColor.DARK_RED + "  only sends non-whitelisted players.", cmdClickConf));
         inv.setItem(35,createGuiItem(Material.BARRIER, "§cRestart the server", ChatColor.DARK_RED + "This will send players back to lobby first.", cmdClickConf));
-
     }
-
-    
-    
-    
     
 	public static Material getGUIMat(Boolean trueFalse) {
 		if (trueFalse) return Material.GREEN_STAINED_GLASS_PANE;
@@ -150,7 +146,6 @@ public class WLGui implements Listener {
         ent.openInventory(inv);
     }
 
-    
     Boolean getTF(Boolean b) {
     	if (b == true) return false;
     	else return true;
@@ -162,52 +157,97 @@ public class WLGui implements Listener {
     {
         Player p = (Player) e.getWhoClicked();
 		e.setCancelled(true);
+
+		TextComponent msg = new TextComponent("Click me to be given the command. Hover to see current.");
+		msg.setColor(ChatColor.GOLD);
+		
     	if (ChatColor.translateAlternateColorCodes('&', e.getView().getTitle()).equals(WLGui.title)) {
     		if (e.getCurrentItem() != null) if (e.getSlot() < slots) {
     			String name = e.getCurrentItem().getItemMeta().getDisplayName();
+    			
     			// Boolean
     			if (name.contains("Whitelist Enabled")) {
-    				WLStorage.setWhitelist(getTF(WLStorage.isWhitelisting()));
-    				inv.setItem(0,createGuiItem(getGUIMat(WLStorage.isWhitelisting()), "§6Whitelist Enabled", "§eEnabled: " + getTFColor(WLStorage.isWhitelisting()), WLGui.tfClick));// Filler
-    		    	for (Integer i = 0 ; i < inv.getSize() ; i++) {
-    		    		if (inv.getItem(i).getItemMeta().getDisplayName().contains("AWL on")) {
-    		    			inv.setItem(i,createGuiItem(Material.BLACK_STAINED_GLASS_PANE, ChatColor.GOLD + "AWL on: " + getTFColor(WLStorage.isWhitelisting())));
-    		        	}
-    		        }
+    				if (e.isLeftClick()) {
+        				WLStorage.setWhitelist(getTF(WLStorage.isWhitelisting()));
+        				inv.setItem(0,createGuiItem(getGUIMat(WLStorage.isWhitelisting()), "§6Whitelist Enabled", "§eEnabled: " + getTFColor(WLStorage.isWhitelisting()), WLGui.tfClick));
+        				// Redo Filler
+        		    	for (Integer i = 0 ; i < inv.getSize() ; i++) {
+        		    		if (inv.getItem(i).getItemMeta().getDisplayName().contains("AWL on")) {
+        		    			inv.setItem(i,createGuiItem(Material.BLACK_STAINED_GLASS_PANE, ChatColor.GOLD + "AWL on: " + getTFColor(WLStorage.isWhitelisting())));
+        		        	}
+        		        }
+    				}
+    		    	if (e.isRightClick()) {
+    	    			msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Permission: ").color(ChatColor.GOLD).append("advancedwhitelist.bypass.operator").color(ChatColor.BLUE).create()));
+    	    			msg.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/ advancedwhitelist.bypass.operator"));
+    	    			p.spigot().sendMessage(msg);
+    		    	}
     			}
     			if (name.contains("Config Access Enabled")) {
     				WLStorage.setConfigAccess(getTF(WLStorage.isConfigAccess()));
     		        inv.setItem(1,createGuiItem(getGUIMat(WLStorage.isConfigAccess()), "§eConfig Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isConfigAccess()), tfClick));
     			}
     			if (name.contains("ProjectTeam Access Enabled"))  {
-    				WLStorage.setProjectTeamAccess(getTF(WLStorage.isProjectTeamAccess()));
-    		        inv.setItem(2,createGuiItem(getGUIMat(WLStorage.isProjectTeamAccess()), "§eProjectTeam Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isProjectTeamAccess()), tfClick));
+    				if (e.isLeftClick()) {
+        				WLStorage.setProjectTeamAccess(getTF(WLStorage.isProjectTeamAccess()));
+        		        inv.setItem(2,createGuiItem(getGUIMat(WLStorage.isProjectTeamAccess()), "§eProjectTeam Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isProjectTeamAccess()), tfClick));
+    				}
+    		    	if (e.isRightClick()) {
+    	    			msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Permission: ").color(ChatColor.GOLD).append("advancedwhitelist.bypass.projectteam").color(ChatColor.BLUE).create()));
+    	    			msg.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/ advancedwhitelist.bypass.projectteam"));
+    	    			p.spigot().sendMessage(msg);
+    		    	}
     			}
     			if (name.contains("Staff Access Enabled")) {
-    				WLStorage.setStaffAccess(getTF(WLStorage.isStaffAccess()));
-    		        inv.setItem(3,createGuiItem(getGUIMat(WLStorage.isStaffAccess()), "§eStaff Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isStaffAccess()), tfClick));
+    				if (e.isLeftClick()) {
+        				WLStorage.setStaffAccess(getTF(WLStorage.isStaffAccess()));
+        		        inv.setItem(3,createGuiItem(getGUIMat(WLStorage.isStaffAccess()), "§eStaff Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isStaffAccess()), tfClick));
+    				}
+    		    	if (e.isRightClick()) {
+    	    			msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Permission: ").color(ChatColor.GOLD).append("advancedwhitelist.bypass.Staff").color(ChatColor.BLUE).create()));
+    	    			msg.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/ advancedwhitelist.bypass.Staff"));
+    	    			p.spigot().sendMessage(msg);
+    		    	}
     			}
     			if (name.contains("Tester Access Enabled")) {
-    				WLStorage.setTesterAccess(getTF(WLStorage.isTesterAccess()));
-    		        inv.setItem(4,createGuiItem(getGUIMat(WLStorage.isTesterAccess()), "§eTester Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isTesterAccess()), tfClick));
+    				if (e.isLeftClick()) {
+        				WLStorage.setTesterAccess(getTF(WLStorage.isTesterAccess()));
+        		        inv.setItem(4,createGuiItem(getGUIMat(WLStorage.isTesterAccess()), "§eTester Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isTesterAccess()), tfClick));
+    				}
+    		    	if (e.isRightClick()) {
+    	    			msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Permission: ").color(ChatColor.GOLD).append("advancedwhitelist.bypass.Tester").color(ChatColor.BLUE).create()));
+    	    			msg.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/ advancedwhitelist.bypass.Tester"));
+    	    			p.spigot().sendMessage(msg);
+    		    	}
     			}
     			if (name.contains("Alternate Access Enabled")) {
-    				WLStorage.setAlternateAccess(getTF(WLStorage.isAlternateAccess()));
-    		        inv.setItem(5,createGuiItem(getGUIMat(WLStorage.isAlternateAccess()), "§eAlternate Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isAlternateAccess()), tfClick));
+    				if (e.isLeftClick()) {
+        				WLStorage.setAlternateAccess(getTF(WLStorage.isAlternateAccess()));
+        		        inv.setItem(5,createGuiItem(getGUIMat(WLStorage.isAlternateAccess()), "§eAlternate Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isAlternateAccess()), tfClick));
+    				}
+    		    	if (e.isRightClick()) {
+    	    			msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Permission: ").color(ChatColor.GOLD).append("advancedwhitelist.bypass.Alternate").color(ChatColor.BLUE).create()));
+    	    			msg.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/ advancedwhitelist.bypass.Alternate"));
+    	    			p.spigot().sendMessage(msg);
+    		    	}
     			}
     			if (name.contains("Other Access Enabled")) {
-    				WLStorage.setOtherAccess(getTF(WLStorage.isOtherAccess()));
-    		        inv.setItem(6,createGuiItem(getGUIMat(WLStorage.isOtherAccess()), "§eOther Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isOtherAccess()), tfClick));
+    				if (e.isLeftClick()) {
+        				WLStorage.setOtherAccess(getTF(WLStorage.isOtherAccess()));
+        		        inv.setItem(6,createGuiItem(getGUIMat(WLStorage.isOtherAccess()), "§eOther Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isOtherAccess()), tfClick));
+    				}
+    		    	if (e.isRightClick()) {
+    	    			msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Permission: ").color(ChatColor.GOLD).append("advancedwhitelist.bypass.Other").color(ChatColor.BLUE).create()));
+    	    			msg.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/ advancedwhitelist.bypass.Other"));
+    	    			p.spigot().sendMessage(msg);
+    		    	}
     			}
     			if (name.contains("Server Cooldown Enabled")) {
     				WLStorage.setServerCooldown(getTF(WLStorage.isServerCooldown()));
     		        inv.setItem(7,createGuiItem(getGUIMat(WLStorage.isServerCooldown()), "§eServer Cooldown Enabled", "§eEnabled: " + getTFColor(WLStorage.isServerCooldown()), tfClick));
     			}
     			
-    			
     			// Messages
-    			TextComponent msg = new TextComponent("Click me to enter a number or string as required. Hover to see current.");
-    			msg.setColor(ChatColor.GOLD);
     			
     			if (name.contains("Not Whitelisted Message")) {
     				if (e.isRightClick()) Utility.sendMsg(p, "§7Not Whitelisted Message: " + WLStorage.getNotWhitelistMsg());
@@ -255,7 +295,6 @@ public class WLGui implements Listener {
     		        inv.setItem(13,createGuiItem(Material.ORANGE_STAINED_GLASS_PANE, "§eLobby/Hub Server", "§eServer: §6" + WLStorage.getHubServer(), msgClick, "Refer to Bungee server settings to find Hub/Lobby name."));
     			}
     			
-    			
     			// Durations
     			if (name.contains("Server Cooldown Duration")) {
     				if (e.isLeftClick()) if (e.isShiftClick()) WLStorage.setServerCooldownTime(WLStorage.getServerCooldown() + 4);
@@ -295,6 +334,15 @@ public class WLGui implements Listener {
     			}
     			
     			// Commands
+    			if (name.contains("Help Menu")) {
+    				if (e.isLeftClick()) WLCmd.getHelp(p);
+    				if (e.isRightClick()) {
+		    			msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("/awl help <Page number>").create()));
+		    			msg.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/awl help <Page number>"));
+		    			p.spigot().sendMessage(msg);
+    				}
+    			}
+    			if (name.contains("Whitelist Status")) WLCmd.getStatus(p);
     			if (name.contains("Add player to Config Access List")) {
 	    			msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("/awl add <name>").create()));
 	    			msg.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/awl add <name>"));
@@ -306,6 +354,7 @@ public class WLGui implements Listener {
 	    			p.spigot().sendMessage(msg);
     			}
     			if (name.contains("Show Config Access List")) WLCmd.listPlayers(p);
+    			if (name.contains("Add everyone to Config Access")) if (e.isRightClick()) if (e.isShiftClick()) WLCmd.addAllPlayers();
     			// Caution commands
     			if (name.contains("Reset Config Access List")) if (e.isRightClick()) if (e.isShiftClick()) {
     				WLStorage.clearWhiteLists();

@@ -184,6 +184,7 @@ public class WLStorage {
 	
 	public static void clearWhiteLists() {
 		whitelists.removeAll(whitelists);
+		WLStorage.saveWhitelists();
 		return;
 	}
 
