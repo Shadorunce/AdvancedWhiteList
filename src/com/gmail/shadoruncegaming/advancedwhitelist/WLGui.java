@@ -55,7 +55,7 @@ public class WLGui implements Listener {
     	// getGuiMat(determine material based on other variable)
     	// Enabled?
         inv.setItem(0,createGuiItem(getGUIMat(WLStorage.isWhitelisting()), "§6Whitelist Enabled", "§eEnabled: " + getTFColor(WLStorage.isWhitelisting()), tfClick, tfClick2, perm + "operator"));
-        inv.setItem(1,createGuiItem(getGUIMat(WLStorage.isConfigAccess()), "§eConfig Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isConfigAccess()), tfClick));
+        inv.setItem(1,createGuiItem(getGUIMat(WLStorage.isConfigAccess()), "§eConfig Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isConfigAccess()), "§dThis will need to be enabled to allow added players-"," to join regardless of permissions.", tfClick));
         inv.setItem(2,createGuiItem(getGUIMat(WLStorage.isProjectTeamAccess()), "§eProjectTeam Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isProjectTeamAccess()), tfClick, tfClick2, perm + "ProjectTeam"));
         inv.setItem(3,createGuiItem(getGUIMat(WLStorage.isStaffAccess()), "§eStaff Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isStaffAccess()), tfClick, tfClick2, perm + "Staff"));
         inv.setItem(4,createGuiItem(getGUIMat(WLStorage.isTesterAccess()), "§eTester Access Enabled", "§eEnabled: " + getTFColor(WLStorage.isTesterAccess()), tfClick, tfClick2, perm + "Tester"));
@@ -79,12 +79,12 @@ public class WLGui implements Listener {
         inv.setItem(12,createGuiItem(Material.BROWN_STAINED_GLASS_PANE, "§eMessage sent if player gets kicked", "§eMessage: " + string, msgClick, msgClick2));
         inv.setItem(13,createGuiItem(Material.ORANGE_STAINED_GLASS_PANE, "§eMessage sent if player gets kicked", "§eServer: §6" + WLStorage.getHubServer(), msgClick, "Refer to Bungee server settings to find Hub/Lobby name."));
         // Durations
-        inv.setItem(18,createGuiItem(Material.BLUE_STAINED_GLASS_PANE, "§eServer Cooldown Duration", "§eDuration: §b" + WLStorage.getServerCooldown(), intClick1, intClick2, intClick3));
+        inv.setItem(18,createGuiItem(Material.BLUE_STAINED_GLASS_PANE, "§eServer Cooldown Duration", "§eDuration: §b" + WLStorage.getServerCooldown() + "for players", "-- §b" + WLStorage.getServerCooldown()/3 + "for operator perm", "-- §b" + WLStorage.getServerCooldown()/2 + "for ProjectTeam perm", intClick1, intClick2, intClick3));
         inv.setItem(19,createGuiItem(Material.CYAN_STAINED_GLASS_PANE, "§eDelay Before Starting Kicks", "§eDuration: §b" + WLStorage.getDelayBeforeStartingKicks(), intClick1, intClick2, intClick3));
         inv.setItem(20,createGuiItem(Material.LIGHT_BLUE_STAINED_GLASS_PANE, "§eKick Delay Per Player", "§eDuration: §b" + WLStorage.getKickDelayPerPlayer(), intClick1, intClick2, intClick3));
         // Commands
         	//help
-        inv.setItem(27,createGuiItem(Material.ORANGE_STAINED_GLASS_PANE, ChatColor.GOLD + "Help Menu", cmdClick, ChatColor.GOLD + "Right Click for command text to see other help menus"));
+        inv.setItem(27,createGuiItem(Material.ORANGE_STAINED_GLASS_PANE, ChatColor.GOLD + "Help Menu", cmdClick, ChatColor.GOLD + "Right Click for command text to see other help menus."));
         	//status
         inv.setItem(28,createGuiItem(Material.CYAN_STAINED_GLASS_PANE, 
         		ChatColor.GOLD + "Whitelist Status", 
@@ -101,7 +101,7 @@ public class WLGui implements Listener {
         		"§6Delay Before Starting Kicks: " + getTFColor(WLStorage.isWhitelisting()),
         		"§6Kick Delay Per Player: " + getTFColor(WLStorage.isWhitelisting())
         		));
-        inv.setItem(29,createGuiItem(Material.LIME_STAINED_GLASS_PANE, ChatColor.DARK_GREEN + "Add player to Config Access List", cmdClick));
+        inv.setItem(29,createGuiItem(Material.LIME_STAINED_GLASS_PANE, ChatColor.DARK_GREEN + "Add player to Config Access List", "§dNeeds Config Access Enabled to allow added players to connect.", cmdClick));
         inv.setItem(30,createGuiItem(Material.PINK_STAINED_GLASS_PANE, ChatColor.DARK_RED + "Remove player from Config Access List", cmdClick));
         inv.setItem(31,createGuiItem(Material.PURPLE_STAINED_GLASS_PANE, "§bShow Config Access List", ChatColor.DARK_BLUE + "Get the Config Access List in chat.", cmdClick));
         inv.setItem(32,createGuiItem(Material.WHITE_STAINED_GLASS_PANE, ChatColor.DARK_GREEN + "Add everyone to Config Access", "§dAdd everyone currently connected.", cmdClickConf));
