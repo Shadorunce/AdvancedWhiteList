@@ -46,12 +46,24 @@
 - Separated Messages from main status check to lessen the amount of text being sent to admin.
 - Added reset list command to clear the Whitelist list
 
-1.2.0
+1.2.0:
 - Added GUI
 - Added an option to Add All connected players to the Config Access List
 
+1.2.1:
+- Removed OP access and "*" permission from having access to anything in AWL automatically for commands and bypass and require the specific permissions.
+- Made OP access customizable in game with command or GUI.
+- Added extra permissions that combine lower bypass.
+- Customizable GUI items
+- Cleaned Config file.
+- Added close GUI when clicking outside inv
 
 Future Plans:
 - Add a summary, Put numbers instead of names for summary
 - Added proper Config version check at start so that it will rename the old file and enter a new one with existing values for easy transfer
 - Get Header comments to save into file.
+
+
+Not likely to happen:
+- Added Anvil GUI to add names and type numbers for delay amounts.
+-- Due to it requiring NMS at the moment as it's not Bukkit/Spigot implemented and it would need to be updated for each MC Version.

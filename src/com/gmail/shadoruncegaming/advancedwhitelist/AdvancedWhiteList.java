@@ -21,16 +21,15 @@ public class AdvancedWhiteList extends JavaPlugin implements PluginMessageListen
         Metrics metrics = new Metrics((Plugin)this, pluginId);
         metrics.addCustomChart(new Metrics.SimplePie("chart_id", () -> "My value"));
 		start = System.currentTimeMillis();
-		this.storage = new WLStorage(this);
-		this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
-		this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", (PluginMessageListener) this);
-		this.saveDefaultConfig();
-		this.saveConfig();
-		this.getCommand("advancedwhitelist").setExecutor(new WLCmd(this));
-		this.getServer().getPluginManager().registerEvents(new WLEvent(), this);
-		this.getServer().getPluginManager().registerEvents(new WLGui(), this);
-		this.event = new WLEvent();
-    	this.gui = this.getGUI();
+		storage = new WLStorage(this);
+		getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+		getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", (PluginMessageListener) this);
+		setupConfig();
+		getCommand("advancedwhitelist").setExecutor(new WLCmd(this));
+		getServer().getPluginManager().registerEvents(new WLEvent(), this);
+		getServer().getPluginManager().registerEvents(new WLGui(), this);
+		event = new WLEvent();
+    	gui = getGUI();
 		Utility.sendConsole("&6&lAdvanced&a&lWhitelist &7> Loaded!");
 		getStorage();
 		WLStorage.reload();
@@ -41,23 +40,30 @@ public class AdvancedWhiteList extends JavaPlugin implements PluginMessageListen
 		return;
 	}
 	
+	public void setupConfig() {
+		getConfig().options().copyDefaults(true);
+		saveDefaultConfig();
+		saveConfig();
+	}
+	
 	public static AdvancedWhiteList getInstance() {
 		return instance;
 	}
 
 	public void onDisable() {
+		
 	}
 	
 	public WLEvent getEvent() {
-		return this.event;
+		return event;
 	}
 
 	public WLStorage getStorage() {
-		return this.storage;
+		return storage;
 	}
 	
 	public WLGui getGUI() {
-		return this.gui;
+		return gui;
 	}
 	
 	

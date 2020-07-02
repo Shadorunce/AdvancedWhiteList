@@ -1,5 +1,5 @@
 name: AdvancedWhiteList
-version: 1.2.1
+version: 1.2.0
 api-version: 1.15
 author: Shadorunce
 prefix: AWL
@@ -34,50 +34,3 @@ permissions:
    advancedwhitelist.bypass.alternate:
       description: If AWL access is enabled and Alternate access is enabled, will have access to enter the server. Doesn't mean you'll have access to AWL commands.
       default: false
-   advancedwhitelist.bypass.projectteam-:
-      description: Includes all bypass except operators.
-      default: false
-      children:
-         advancedwhitelist.bypass.projectteam: true
-         advancedwhitelist.bypass.staff: true
-         advancedwhitelist.bypass.tester: true
-         advancedwhitelist.bypass.other: true
-         advancedwhitelist.bypass.alternate: true
-   advancedwhitelist.bypass.staff-:
-      description: Includes all bypass except operators and projectteam.
-      default: false
-      children:
-         advancedwhitelist.bypass.staff: true
-         advancedwhitelist.bypass.tester: true
-         advancedwhitelist.bypass.other: true
-         advancedwhitelist.bypass.alternate: true
-   advancedwhitelist.bypass.tester-:
-      description: Includes all bypass except operators, projectteam, and staff.
-      default: false
-      children:
-         advancedwhitelist.bypass.tester: true
-         advancedwhitelist.bypass.other: true
-         advancedwhitelist.bypass.alternate: true
-   advancedwhitelist.bypass.*:
-      description: All access disabled by default.
-      default: false
-      children:
-         advancedwhitelist.bypass.operators: false
-         advancedwhitelist.bypass.projectteam: false
-         advancedwhitelist.bypass.staff: false
-         advancedwhitelist.bypass.tester: false
-         advancedwhitelist.bypass.other: false
-         advancedwhitelist.bypass.alternate: false
-   advancedwhitelist.*:
-      description: All access disabled by default.
-      default: false
-      children:
-         advancedwhitelist.admin: false
-         advancedwhitelist.bypass.*: false
-         advancedwhitelist.bypass.operators: false
-         advancedwhitelist.bypass.projectteam: false
-         advancedwhitelist.bypass.staff: false
-         advancedwhitelist.bypass.tester: false
-         advancedwhitelist.bypass.other: false
-         advancedwhitelist.bypass.alternate: false
-         
