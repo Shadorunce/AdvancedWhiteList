@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 
 public class WLEvent implements Listener {
 
@@ -45,14 +46,38 @@ public class WLEvent implements Listener {
 			}
 		}
 	}
-		static boolean permCheck(Player p) {
-			if (p.hasPermission("AdvancedWhiteList.Bypass.Operator") || p.hasPermission("AdvancedWhiteList.Bypass.Operators")) {return true;}
-			if (WLStorage.isConfigAccess() == true && WLStorage.isWhitelisted(p.getName()))  {return true;}
-			if (WLStorage.isProjectTeamAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.ProjectTeam")) {return true;}
-			if (WLStorage.isStaffAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.Staff")) {return true;}
-			if (WLStorage.isTesterAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.Tester")) {return true;}
-			if (WLStorage.isAlternateAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.Alternate")) {return true;}
-			if (WLStorage.isOtherAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.Other")) {return true;}
-			return false;
+	
+	static void receiveMsg(String name) {
+		
+	}
+	
+	static boolean permCheck(Player p) {
+		if (WLStorage.isConfigAccess() == true && WLStorage.isWhitelisted(p.getName()))  return true;
+		boolean hasAwlPerm = false;
+
+		if (!WLStorage.isOpBypass()) {
+			if (p.isOp() || p.hasPermission("*")) {
+				for (PermissionAttachmentInfo perm : p.getEffectivePermissions()) {
+					if (perm.getPermission().equalsIgnoreCase("AdvancedWhiteList.Bypass.Operator") || perm.getPermission().equalsIgnoreCase("AdvancedWhiteList.Bypass.Operators")) {hasAwlPerm = true;}
+					if (WLStorage.isProjectTeamAccess() == true && perm.getPermission().equalsIgnoreCase("AdvancedWhiteList.Bypass.ProjectTeam")) {hasAwlPerm = true;}
+					if (WLStorage.isStaffAccess() == true && perm.getPermission().equalsIgnoreCase("AdvancedWhiteList.Bypass.Staff")) {hasAwlPerm = true;}
+					if (WLStorage.isTesterAccess() == true && perm.getPermission().equalsIgnoreCase("AdvancedWhiteList.Bypass.Tester")) {hasAwlPerm = true;}
+					if (WLStorage.isAlternateAccess() == true && perm.getPermission().equalsIgnoreCase("AdvancedWhiteList.Bypass.Alternate")) {hasAwlPerm = true;}
+					if (WLStorage.isOtherAccess() == true && perm.getPermission().equalsIgnoreCase("AdvancedWhiteList.Bypass.Other")) {hasAwlPerm = true;}
+				}
+				if (hasAwlPerm == false) {
+					Utility.sendConsole(p.getName() + " has OP or * Perm but doesn't have permission to connect.");
+				}
+			}
 		}
+		else {
+			if (p.hasPermission("AdvancedWhiteList.Bypass.Operator") || p.hasPermission("AdvancedWhiteList.Bypass.Operators")) {hasAwlPerm = true;}
+			if (WLStorage.isProjectTeamAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.ProjectTeam")) {hasAwlPerm = true;}
+			if (WLStorage.isStaffAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.Staff")) {hasAwlPerm = true;}
+			if (WLStorage.isTesterAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.Tester")) {hasAwlPerm = true;}
+			if (WLStorage.isAlternateAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.Alternate")) {hasAwlPerm = true;}
+			if (WLStorage.isOtherAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.Other")) {hasAwlPerm = true;}
+		}
+		return hasAwlPerm;
+	}
 }

@@ -1,59 +1,303 @@
 package com.gmail.shadoruncegaming.advancedwhitelist;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
 
 public class WLStorage {
 	static AdvancedWhiteList m;
 	private static String configVersion;
-	private static ArrayList<String> whitelists = new ArrayList<String>();
-	public static boolean WhitelistEnabled = false;
-	public static boolean ProjectTeamAccessEnabled = false;
-	public static boolean StaffAccessEnabled = false;
-	public static boolean TesterAccessEnabled = false;
-	public static boolean AlternateAccessEnabled = false;
-	public static boolean OtherAccessEnabled = false;
-	public static boolean ConfigAccessEnabled = false;
-	public static boolean ServerCooldownEnabled = true;
-	public static long ServerCooldownDuration = 60; // In seconds based on from start of plugin.
-	public static long delayBeforeStartingKicks = 4; // In seconds.
-	public static long kickDelayPerPlayer = 1; // In seconds.
-	public static String hubServer = "lobby";
-	public static String notwhitelistmsg = "&eSorry, the server is currently in Whitelist mode, please enjoy one of our other servers. :)";
-	public static String broadcastmsg = "&eSorry, the server is currently in Whitelist mode, please enjoy one of our other servers. :)";
-	public static String sendmsg = "&eSorry, the server is currently in Whitelist mode, please enjoy one of our other servers. :)";
-	public static String kickmsg = "&eSorry, the server is currently in Whitelist mode, please enjoy one of our other servers. :)";
+	private static ArrayList<String> whitelists = new ArrayList<String>(Arrays.asList("ExampleNameThatWouldHaveAccessIfConfigAccessIsOn_PleaseReplaceThis"));
+	private static boolean WhitelistEnabled = false;
+	private static boolean ProjectTeamAccessEnabled = false;
+	private static boolean StaffAccessEnabled = false;
+	private static boolean TesterAccessEnabled = false;
+	private static boolean AlternateAccessEnabled = false;
+	private static boolean OtherAccessEnabled = false;
+	private static boolean ConfigAccessEnabled = false;
+	private static String notwhitelistmsg = "&eSorry, the server is currently in Whitelist mode, please enjoy one of our other servers. :)";
+	private static String broadcastmsg = "&eSorry, the server is currently in Whitelist mode, please enjoy one of our other servers. :)";
+	private static String sendmsg = "&eSorry, the server is currently in Whitelist mode, please enjoy one of our other servers. :)";
+	private static String kickmsg = "&eSorry, the server is currently in Whitelist mode, please enjoy one of our other servers. :)";
+	private static long ServerCooldownDuration = 60; // In seconds based on from start of plugin.
+	private static long delayBeforeStartingKicks = 4; // In seconds.
+	private static long kickDelayPerPlayer = 1; // In seconds.
+	private static boolean ServerCooldownEnabled = true;
+	private static String hubServer = "lobby";
+	private static boolean opBypass = false;
+
+	private static Material guiTrue = Material.GREEN_STAINED_GLASS_PANE;
+	private static Material guiFalse = Material.RED_STAINED_GLASS_PANE;
+	private static Material guiLobby = Material.COMPASS;
+	private static Material guiNotWlMsg = Material.PAPER;
+	private static Material guiBcMsg = Material.PAPER;
+	private static Material guiSendMsg = Material.PAPER;
+	private static Material guiKickMsg = Material.PAPER;
+	private static Material guiCdDuration = Material.CLOCK;
+	private static Material guiDelayStartKicks = Material.CLOCK;
+	private static Material guiKickDelayPlayer = Material.CLOCK;
+	private static Material guiHelp = Material.BOOKSHELF;
+	private static Material guiStatus = Material.BOOK;
+	private static Material guiWlConfigList = Material.WRITABLE_BOOK;
+	private static Material guiAdd = Material.EMERALD;
+	private static Material guiRemove = Material.REDSTONE;
+	private static Material guiAddAllOnline = Material.EMERALD_BLOCK;
+	private static Material guiRemoveAll = Material.REDSTONE_BLOCK;
+	private static Material guiSendPlayers = Material.BARRIER;
+	private static Material guiRestartServer = Material.BARRIER;
+	private static Material guiAnvilItem = Material.NAME_TAG;
 
 	public WLStorage(AdvancedWhiteList m) {
         WLStorage.m = m;
     }
 
 	public static void reload() {
-		m.reloadConfig();
-		FileConfiguration config = WLStorage.m.getConfig();
-		WLStorage.configVersion = config.getString("config_version");
-		WLStorage.whitelists = new ArrayList<String>(config.getStringList("whitelisted"));
-		WLStorage.WhitelistEnabled = config.getBoolean("whitelist_enabled");
-		WLStorage.ServerCooldownEnabled = config.getBoolean("server_cooldown");
-		WLStorage.ServerCooldownDuration = config.getInt("server_cooldown_duration");
-		WLStorage.ProjectTeamAccessEnabled = config.getBoolean("ProjectTeam_Access");
-		WLStorage.StaffAccessEnabled = config.getBoolean("Staff_Access");
-		WLStorage.TesterAccessEnabled = config.getBoolean("Tester_Access");
-		WLStorage.AlternateAccessEnabled = config.getBoolean("Alternate_Access");
-		WLStorage.OtherAccessEnabled = config.getBoolean("Other_Access");
-		WLStorage.ConfigAccessEnabled = config.getBoolean("Config_Access");
-		WLStorage.notwhitelistmsg = Utility.TransColor(config.getString("not_whitelisted_message"));
-		WLStorage.hubServer = Utility.TransColor(config.getString("server_to_send_to"));
-		WLStorage.broadcastmsg = Utility.TransColor(config.getString("send_or_kick_broadcast_message"));
-		WLStorage.delayBeforeStartingKicks = config.getInt("delay_before_starting_kicks");
-		WLStorage.kickDelayPerPlayer = config.getInt("kick_delay_per_player");
-		WLStorage.sendmsg = Utility.TransColor(config.getString("send_message"));
-		WLStorage.kickmsg = Utility.TransColor(config.getString("kick_message"));
-		m.saveConfig();
-		Utility.sendConsole("&e&lAdvancedWhitelist > &7Config reloaded.");
+		try {
+			m.reloadConfig();
+		} catch(Exception e) {
+			m.setupConfig();
+			Utility.sendConsole("Something went wrong with config. Please recheck your configuration as the setting that went wrong was likely set back to default.");
+			m.reloadConfig();
+		}
+		FileConfiguration config = m.getConfig();
+		// TODO Implement auto convert from old version to new version. of config file.
+		try {
+			configVersion = config.getString("config_version_dont_change");
+		} catch(Exception e) {configVersion = "incorrect";}
+		try {
+			whitelists = new ArrayList<String>(config.getStringList("whitelisted"));
+		} catch(Exception e) {whitelists = new ArrayList<String>(Arrays.asList("ExampleNameThatWouldHaveAccessIfConfigAccessIsOn_PleaseReplaceThis"));
+		Utility.sendConsole("Something was wrong with whitelisted list, setting to default.");}
+		try {
+			WhitelistEnabled = config.getBoolean("config.access_enabled.whitelist");
+		} catch(Exception e) {WhitelistEnabled = false;
+		Utility.sendConsole("Something was wrong with enabled: whitelist, setting to default.");}
+		try {
+			ConfigAccessEnabled = config.getBoolean("config.access_enabled.config_access");
+		} catch(Exception e) {ConfigAccessEnabled = false;
+		Utility.sendConsole("Something was wrong with enabled: config access, setting to default.");}
+		try {
+			ProjectTeamAccessEnabled = config.getBoolean("config.access_enabled.teams.projectteam");
+		} catch(Exception e) {ProjectTeamAccessEnabled = false;
+		Utility.sendConsole("Something was wrong with access enabled: teams: projectteam, setting to default.");}
+		try {
+			StaffAccessEnabled = config.getBoolean("config.access_enabled.teams.staff");
+		} catch(Exception e) {StaffAccessEnabled = false;
+		Utility.sendConsole("Something was wrong with enabled: teams: staff, setting to default.");}
+		try {
+			TesterAccessEnabled = config.getBoolean("config.access_enabled.teams.tester");
+		} catch(Exception e) {TesterAccessEnabled = false;
+		Utility.sendConsole("Something was wrong with enabled: teams: tester, setting to default.");}
+		try {
+			AlternateAccessEnabled = config.getBoolean("config.access_enabled.teams.alternate");
+		} catch(Exception e) {AlternateAccessEnabled = false;
+		Utility.sendConsole("Something was wrong with enabled: teams: alternate, setting to default.");}
+		try {
+			OtherAccessEnabled = config.getBoolean("config.access_enabled.teams.other");
+		} catch(Exception e) {OtherAccessEnabled = false;
+		Utility.sendConsole("Something was wrong with enabled: teams: other, setting to default.");}
+		try {
+			notwhitelistmsg = Utility.TransColor(config.getString("config.messages.not_whitelisted_message"));
+		} catch(Exception e) {notwhitelistmsg = "Something went wrong with the config, contact an Admin if you got this message.";
+		Utility.sendConsole("Something was wrong with not_whitelisted_message, setting to error message to players.");}
+		try {
+			broadcastmsg = Utility.TransColor(config.getString("config.messages.send_or_kick_broadcast_message"));
+		} catch(Exception e) {broadcastmsg = "Something went wrong with the config, contact an Admin if you got this message.";
+		Utility.sendConsole("Something was wrong with send_or_kick_broadcast_message, setting to error message to players.");}
+		try {
+			sendmsg = Utility.TransColor(config.getString("config.messages.send_message"));
+		} catch(Exception e) {sendmsg = "Something went wrong with the config, contact an Admin if you got this message.";
+		Utility.sendConsole("Something was wrong with send_message, setting to error message to players.");}
+		try {
+			kickmsg = Utility.TransColor(config.getString("config.messages.kick_message"));
+		} catch(Exception e) {kickmsg = "Something went wrong with the config, contact an Admin if you got this message.";
+		Utility.sendConsole("Something was wrong with kick_message, setting to error message to players.");}
+		try {
+			ServerCooldownDuration = config.getInt("config.durations.server_cooldown_duration");
+		} catch(Exception e) {ServerCooldownDuration = 90;
+		Utility.sendConsole("Something was wrong with server_cooldown_duration, setting to default.");}
+		try {
+			delayBeforeStartingKicks = config.getInt("config.durations.delay_before_starting_kicks");
+		} catch(Exception e) {delayBeforeStartingKicks = 5;
+		Utility.sendConsole("Something was wrong with delay_before_starting_kicks, setting to default.");}
+		try {
+			kickDelayPerPlayer = config.getInt("config.durations.kick_delay_per_player");
+		} catch(Exception e) {kickDelayPerPlayer = 1;
+		Utility.sendConsole("Something was wrong with kick_delay_per_player, setting to default.");}
+		try {
+			ServerCooldownEnabled = config.getBoolean("config.misc.server_cooldown");
+		} catch(Exception e) {ServerCooldownEnabled = true;
+		Utility.sendConsole("Something was wrong with server_cooldown, setting to default.");}
+		try {
+			hubServer = Utility.TransColor(config.getString("config.misc.server_to_send_to"));
+		} catch(Exception e) {hubServer = "lobby";
+		Utility.sendConsole("Something was wrong with server_to_send_to, setting to default.");}
+		try {
+			opBypass = config.getBoolean("config.misc.allow_op_and_star_bypass");
+		} catch(Exception e) {opBypass = false;
+		Utility.sendConsole("Something was wrong with allow_op_and_star_bypass, setting to default.");}
+		
+		// GUI
+		try {
+			guiTrue = Material.getMaterial(config.getString("gui.enabled_row1.true").toUpperCase());
+		} catch(Exception e) {guiTrue = Material.GREEN_STAINED_GLASS_PANE;
+		Utility.sendConsole("GUI item True was invalid, setting to default.");}
+		try {
+			guiFalse = Material.getMaterial(config.getString("gui.enabled_row1.false").toUpperCase());
+		} catch(Exception e) {guiFalse = Material.RED_STAINED_GLASS_PANE;
+		Utility.sendConsole("GUI item False was invalid, setting to default.");}
+		try {
+			guiLobby = Material.getMaterial(config.getString("gui.messages_row2.lobby").toUpperCase());
+		} catch(Exception e) {guiLobby = Material.COMPASS;
+		Utility.sendConsole("GUI item Lobby was invalid, setting to default.");}
+		try {
+			guiNotWlMsg = Material.getMaterial(config.getString("gui.messages_row2.not_whitelisted_message").toUpperCase());
+		} catch(Exception e) {guiNotWlMsg = Material.PAPER;
+		Utility.sendConsole("GUI item Not Whitelisted Message was invalid, setting to default.");}
+		try {
+			guiBcMsg = Material.getMaterial(config.getString("gui.messages_row2.send_or_kick_broadcast_message").toUpperCase());
+		} catch(Exception e) {guiBcMsg = Material.PAPER;
+		Utility.sendConsole("GUI item Send or Kick Broadcast Message was invalid, setting to default.");}
+		try {
+			guiSendMsg = Material.getMaterial(config.getString("gui.messages_row2.send_message").toUpperCase());
+		} catch(Exception e) {guiSendMsg = Material.PAPER;
+		Utility.sendConsole("GUI item Send Message was invalid, setting to default.");}
+		try {
+			guiKickMsg = Material.getMaterial(config.getString("gui.messages_row2.kick_message").toUpperCase());
+		} catch(Exception e) {guiKickMsg = Material.PAPER;
+		Utility.sendConsole("GUI item Kick Message was invalid, setting to default.");}
+		try {
+			guiCdDuration = Material.getMaterial(config.getString("gui.durations_row3.server_cooldown_duration").toUpperCase());
+		} catch(Exception e) {guiCdDuration = Material.CLOCK;
+		Utility.sendConsole("GUI item Server Cooldown Duration was invalid, setting to default.");}
+		try {
+			guiDelayStartKicks = Material.getMaterial(config.getString("gui.durations_row3.delay_before_starting_kicks").toUpperCase());
+		} catch(Exception e) {guiDelayStartKicks = Material.CLOCK;
+		Utility.sendConsole("GUI item Delay Before Starting Kicks was invalid, setting to default.");}
+		try {
+			guiKickDelayPlayer = Material.getMaterial(config.getString("gui.durations_row3.kick_delay_per_player").toUpperCase());
+		} catch(Exception e) {guiKickDelayPlayer = Material.CLOCK;
+		Utility.sendConsole("GUI item Kick Delay per Player was invalid, setting to default.");}
+		try {
+			guiHelp = Material.getMaterial(config.getString("gui.commands_row4.help").toUpperCase());
+		} catch(Exception e) {guiHelp = Material.BOOKSHELF;
+		Utility.sendConsole("GUI item Help was invalid, setting to default.");}
+		try {
+			guiStatus = Material.getMaterial(config.getString("gui.commands_row4.status").toUpperCase());
+		} catch(Exception e) {guiStatus = Material.BOOK;
+		Utility.sendConsole("GUI item Status was invalid, setting to default.");}
+		try {
+			guiWlConfigList = Material.getMaterial(config.getString("gui.commands_row4.whitelisted_config_list").toUpperCase());
+		} catch(Exception e) {guiWlConfigList = Material.WRITABLE_BOOK;
+		Utility.sendConsole("GUI item Whitelisted Config List was invalid, setting to default.");}
+		try {
+			guiAdd = Material.getMaterial(config.getString("gui.commands_row4.add").toUpperCase());
+		} catch(Exception e) {guiAdd = Material.EMERALD;
+		Utility.sendConsole("GUI item Add was invalid, setting to default.");}
+		try {
+			guiRemove = Material.getMaterial(config.getString("gui.commands_row4.remove").toUpperCase());
+		} catch(Exception e) {guiRemove = Material.REDSTONE;
+		Utility.sendConsole("GUI item Remove was invalid, setting to default.");}
+		try {
+			guiAddAllOnline = Material.getMaterial(config.getString("gui.commands_row4.add_all_online").toUpperCase());
+		} catch(Exception e) {guiAddAllOnline = Material.EMERALD_BLOCK;
+		Utility.sendConsole("GUI item Add All Online was invalid, setting to default.");}
+		try {
+			guiRemoveAll = Material.getMaterial(config.getString("gui.commands_row4.remove_all").toUpperCase());
+		} catch(Exception e) {guiRemoveAll = Material.REDSTONE_BLOCK;
+		Utility.sendConsole("GUI item Remove All was invalid, setting to default.");}
+		try {
+			guiSendPlayers = Material.getMaterial(config.getString("gui.commands_row4.send_players_enforce_whitelist").toUpperCase());
+		} catch(Exception e) {guiSendPlayers = Material.BARRIER;
+		Utility.sendConsole("GUI item Send Players Enforce Whitelist was invalid, setting to default.");}
+		try {
+			guiRestartServer = Material.getMaterial(config.getString("gui.commands_row4.restart_server").toUpperCase());
+		} catch(Exception e) {guiRestartServer = Material.BARRIER;
+		Utility.sendConsole("GUI item Restart Server was invalid, setting to default.");}
+		try {
+			guiAnvilItem = Material.getMaterial(config.getString("gui.anvil_item").toUpperCase());
+		} catch(Exception e) {guiRestartServer = Material.NAME_TAG;
+		Utility.sendConsole("GUI item Anvil Item was invalid, setting to default.");}
+		
+		Utility.sendConsole("&e&lAdvancedWhitelist > &7Config reloaded - In-game values matched to config.");
+		m.setupConfig();
 	}
 
+	public static void convertConfig() {
+		m.reloadConfig();
+		FileConfiguration config = m.getConfig();
+		try {
+			WhitelistEnabled = config.getBoolean("whitelist_enabled");
+			config.set("whitelist_enabled", null);
+		} catch(Exception e) {}
+		try {
+			ConfigAccessEnabled = config.getBoolean("Config_Access");
+			config.set("Config_Access", null);
+		} catch(Exception e) {}
+		try {
+			ProjectTeamAccessEnabled = config.getBoolean("ProjectTeam_Access");
+			config.set("ProjectTeam_Access", null);
+		} catch(Exception e) {}
+		try {
+			StaffAccessEnabled = config.getBoolean("Staff_Access");
+			config.set("Staff_Access", null);
+		} catch(Exception e) {}
+		try {
+			TesterAccessEnabled = config.getBoolean("Tester_Access");
+			config.set("Tester_Access", null);
+		} catch(Exception e) {}
+		try {
+			AlternateAccessEnabled = config.getBoolean("Alternate_Access");
+			config.set("Alternate_Access", null);
+		} catch(Exception e) {}
+		try {
+			OtherAccessEnabled = config.getBoolean("Other_Access");
+			config.set("Other_Access", null);
+		} catch(Exception e) {}
+		try {
+			notwhitelistmsg = Utility.TransColor(config.getString("not_whitelisted_message"));
+			config.set("not_whitelisted_message", null);
+		} catch(Exception e) {}
+		try {
+			broadcastmsg = Utility.TransColor(config.getString("send_or_kick_broadcast_message"));
+			config.set("send_or_kick_broadcast_message", null);
+		} catch(Exception e) {}
+		try {
+			sendmsg = Utility.TransColor(config.getString("send_message"));
+			config.set("send_message", null);
+		} catch(Exception e) {}
+		try {
+			kickmsg = Utility.TransColor(config.getString("kick_message"));
+			config.set("kick_message", null);
+		} catch(Exception e) {}
+		try {
+			ServerCooldownDuration = config.getInt("server_cooldown_duration");
+			config.set("server_cooldown_duration", null);
+		} catch(Exception e) {}
+		try {
+			delayBeforeStartingKicks = config.getInt("delay_before_starting_kicks");
+			config.set("delay_before_starting_kicks", null);
+		} catch(Exception e) {}
+		try {
+			kickDelayPerPlayer = config.getInt("kick_delay_per_player");
+			config.set("kick_delay_per_player", null);
+		} catch(Exception e) {}
+		try {
+			ServerCooldownEnabled = config.getBoolean("server_cooldown");
+			config.set("server_cooldown", null);
+		} catch(Exception e) {}
+		try {
+			hubServer = Utility.TransColor(config.getString("server_to_send_to"));
+			config.set("server_to_send_to", null);
+		} catch(Exception e) {}
+		saveWhitelists();
+		m.saveConfig();
+		Utility.sendConsole("&e&lAdvancedWhitelist > &7Config converted.");
+	}
+	
 	public static void saveWhitelists() {
 /*		File configFile = new File(this.m.getDataFolder(), "config.yml");
 		if (!configFile.exists()) {
@@ -61,198 +305,286 @@ public class WLStorage {
 //			setup(m);
 			m.saveConfig();
 		}*/
-		FileConfiguration c = WLStorage.m.getConfig();
-		c.set("whitelisted", WLStorage.whitelists);
-		c.set("whitelist_enabled", WLStorage.isWhitelisting());
-		c.set("server_cooldown", WLStorage.isServerCooldown());
-		c.set("server_cooldown_duration", WLStorage.getServerCooldown());
-		c.set("ProjectTeam_Access", WLStorage.isProjectTeamAccess());
-		c.set("Staff_Access", WLStorage.isStaffAccess());
-		c.set("Tester_Access", WLStorage.isTesterAccess());
-		c.set("Alternate_Access", WLStorage.isAlternateAccess());
-		c.set("Other_Access", WLStorage.isOtherAccess());
-		c.set("Config_Access", WLStorage.isConfigAccess());
-		c.set("not_whitelisted_message", WLStorage.getNotWhitelistMsg());
-		c.set("server_to_send_to", WLStorage.getHubServer());
-		c.set("send_or_kick_broadcast_message", WLStorage.getBroadcastMsg());
-		c.set("delay_before_starting_kicks", WLStorage.getDelayBeforeStartingKicks());
-		c.set("kick_delay_per_player", WLStorage.getKickDelayPerPlayer());
-		c.set("send_message", WLStorage.getSendMsg());
-		c.set("kick_message", WLStorage.getKickMsg());
+
+		FileConfiguration c = m.getConfig();
+		c.set("whitelisted", whitelists);
+		c.set("config.access_enabled.whitelist", isWhitelisting());
+		c.set("config.access_enabled.config_access", isConfigAccess());
+		c.set("config.access_enabled.teams.projectteam", isProjectTeamAccess());
+		c.set("config.access_enabled.teams.staff", isStaffAccess());
+		c.set("config.access_enabled.teams.tester", isTesterAccess());
+		c.set("config.access_enabled.teams.alternate", isAlternateAccess());
+		c.set("config.access_enabled.teams.other", isOtherAccess());
+		c.set("config.messages.not_whitelisted_message", getNotWhitelistMsg());
+		c.set("config.messages.send_or_kick_broadcast_message", getBroadcastMsg());
+		c.set("config.messages.send_message", getSendMsg());
+		c.set("config.messages.kick_message", getKickMsg());
+		c.set("config.durations.server_cooldown_duration", getServerCooldown());
+		c.set("config.durations.delay_before_starting_kicks", getDelayBeforeStartingKicks());
+		c.set("config.durations.kick_delay_per_player", getKickDelayPerPlayer());
+		c.set("config.misc.server_cooldown", isServerCooldown());
+		c.set("config.misc.server_to_send_to", getHubServer());
+		c.set("config.misc.allow_op_and_star_bypass", isOpBypass());
 		m.saveConfig();
-		reload();
+		//reload();
 	}
 
-	public String getConfigVersion() {
-		return WLStorage.configVersion;
+	public static String getConfigVersion() {
+		return configVersion;
 	}
 	
 	public static boolean isWhitelisted(String name) {
-		return WLStorage.whitelists.contains(name.toLowerCase());
+		return whitelists.contains(name.toLowerCase());
 	}
 
 	public static void addWhitelist(String name) {
-		if (!WLStorage.whitelists.contains(name.toLowerCase())) {
-			WLStorage.whitelists.add(name.toLowerCase());
-			WLStorage.saveWhitelists();
+		if (!whitelists.contains(name.toLowerCase())) {
+			whitelists.add(name.toLowerCase());
+			saveWhitelists();
 		}
 	}
 
 	public static void removeWhitelist(String name) {
-		if (WLStorage.whitelists.contains(name.toLowerCase())) {
-			WLStorage.whitelists.remove(name.toLowerCase());
-			WLStorage.saveWhitelists();
+		if (whitelists.contains(name.toLowerCase())) {
+			whitelists.remove(name.toLowerCase());
+			saveWhitelists();
 		}
 	}
 
 	public static void setWhitelist(Boolean onoff) {
 		WhitelistEnabled = onoff;
-		WLStorage.saveWhitelists();
+		saveWhitelists();
 	}
 
 	public static void setServerCooldown(Boolean onoff) {
-		WLStorage.ServerCooldownEnabled = onoff;
-		WLStorage.saveWhitelists();
+		ServerCooldownEnabled = onoff;
+		saveWhitelists();
 	}
 
 	public static void setServerCooldownTime(Long arg) {
-		WLStorage.ServerCooldownDuration = arg;
-		WLStorage.saveWhitelists();
+		ServerCooldownDuration = arg;
+		saveWhitelists();
 	}
 
 	public static void setProjectTeamAccess(Boolean onoff) {
-		WLStorage.ProjectTeamAccessEnabled = onoff;
-		WLStorage.saveWhitelists();
+		ProjectTeamAccessEnabled = onoff;
+		saveWhitelists();
 	}
 
 	public static void setStaffAccess(Boolean onoff) {
-		WLStorage.StaffAccessEnabled = onoff;
-		WLStorage.saveWhitelists();
+		StaffAccessEnabled = onoff;
+		saveWhitelists();
 	}
 
 	public static void setTesterAccess(Boolean onoff) {
-		WLStorage.TesterAccessEnabled = onoff;
-		WLStorage.saveWhitelists();
+		TesterAccessEnabled = onoff;
+		saveWhitelists();
 	}
 
 	public static void setAlternateAccess(Boolean onoff) {
-		WLStorage.AlternateAccessEnabled = onoff;
-		WLStorage.saveWhitelists();
+		AlternateAccessEnabled = onoff;
+		saveWhitelists();
 	}
 
 	public static void setOtherAccess(Boolean onoff) {
-		WLStorage.OtherAccessEnabled = onoff;
-		WLStorage.saveWhitelists();
+		OtherAccessEnabled = onoff;
+		saveWhitelists();
 	}
 
 	public static void setConfigAccess(Boolean onoff) {
-		WLStorage.ConfigAccessEnabled = onoff;
-		WLStorage.saveWhitelists();
+		ConfigAccessEnabled = onoff;
+		saveWhitelists();
 	}
 	public static void setNotWhitelistMsg(String arg) {
-		WLStorage.notwhitelistmsg = arg;
-		WLStorage.saveWhitelists();
+		notwhitelistmsg = arg;
+		saveWhitelists();
 	}
 	public static void setHubServer(String arg) {
-		WLStorage.hubServer = arg;
-		WLStorage.saveWhitelists();
+		hubServer = arg;
+		saveWhitelists();
 	}
 	public static void setBroadcastMsg(String arg) {
-		WLStorage.broadcastmsg = arg;
-		WLStorage.saveWhitelists();
+		broadcastmsg = arg;
+		saveWhitelists();
 	}
 	public static void setDelayBeforeStartingKicks(Long arg) {
-		WLStorage.delayBeforeStartingKicks = arg;
-		WLStorage.saveWhitelists();
+		delayBeforeStartingKicks = arg;
+		saveWhitelists();
 	}
 	public static void setKickDelayPerPlayer(Long arg) {
-		WLStorage.kickDelayPerPlayer = arg;
-		WLStorage.saveWhitelists();
+		kickDelayPerPlayer = arg;
+		saveWhitelists();
 	}
 	public static void setSendMsg(String arg) {
-		WLStorage.sendmsg = arg;
-		WLStorage.saveWhitelists();
+		sendmsg = arg;
+		saveWhitelists();
 	}
 	public static void setKickMsg(String arg) {
-		WLStorage.kickmsg = arg;
-		WLStorage.saveWhitelists();
+		kickmsg = arg;
+		saveWhitelists();
+	}
+	public static void setOpBypass(Boolean onoff) {
+		opBypass = onoff;
+		saveWhitelists();
 	}
 
 	public static ArrayList<String> getWhiteLists() {
-		return WLStorage.whitelists;
+		return whitelists;
 	}
 	
 	public static void clearWhiteLists() {
 		whitelists.removeAll(whitelists);
-		WLStorage.saveWhitelists();
+		saveWhitelists();
 		return;
 	}
 
 	public static boolean isWhitelisting() {
-		return WLStorage.WhitelistEnabled;
+		return WhitelistEnabled;
 	}
 
 	public static boolean isServerCooldown() {
-		return WLStorage.ServerCooldownEnabled;
+		return ServerCooldownEnabled;
 	}
 
 	public static long getServerCooldown() {
-		return WLStorage.ServerCooldownDuration;
+		return ServerCooldownDuration;
 	}
 
 	public static boolean isProjectTeamAccess() {
-		return WLStorage.ProjectTeamAccessEnabled;
+		return ProjectTeamAccessEnabled;
 	}
 
 	public static boolean isStaffAccess() {
-		return WLStorage.StaffAccessEnabled;
+		return StaffAccessEnabled;
 	}
 
 	public static boolean isTesterAccess() {
-		return WLStorage.TesterAccessEnabled;
+		return TesterAccessEnabled;
 	}
 
 	public static boolean isAlternateAccess() {
-		return WLStorage.AlternateAccessEnabled;
+		return AlternateAccessEnabled;
 	}
 
 	public static boolean isOtherAccess() {
-		return WLStorage.OtherAccessEnabled;
+		return OtherAccessEnabled;
 	}
 
 	public static boolean isConfigAccess() {
-		return WLStorage.ConfigAccessEnabled;
+		return ConfigAccessEnabled;
 	}
 
 	public static String getNotWhitelistMsg() {
-		return WLStorage.notwhitelistmsg;
+		return notwhitelistmsg;
 	}
 
 	public static String getHubServer() {
-		return WLStorage.hubServer;
+		return hubServer;
 	}
 
 	public static String getBroadcastMsg() {
-		return WLStorage.broadcastmsg;
+		return broadcastmsg;
 	}
 
 	public static Long getDelayBeforeStartingKicks() {
-		return WLStorage.delayBeforeStartingKicks;
+		return delayBeforeStartingKicks;
 	}
 
 	public static Long getKickDelayPerPlayer() {
-		return WLStorage.kickDelayPerPlayer;
+		return kickDelayPerPlayer;
+	}
+	
+	public static boolean isOpBypass() {
+		return opBypass;
 	}
 
 	public static String getSendMsg() {
-		return WLStorage.sendmsg;
+		return sendmsg;
 	}
 
 	public static String getKickMsg() {
-		return WLStorage.kickmsg;
+		return kickmsg;
 	}
 	
-
+	public static Material getGuiTrue() {
+		return guiTrue;
+	}
+	
+	public static Material getGuiFalse() {
+		return guiFalse;
+	}
+	
+	public static Material getGuiLobby() {
+		return guiLobby;
+	}
+	
+	public static Material getGuiNotWlMsg() {
+		return guiNotWlMsg;
+	}
+	
+	public static Material getGuiBcMsg() {
+		return guiBcMsg;
+	}
+	
+	public static Material getGuiSendMsg() {
+		return guiSendMsg;
+	}
+	
+	public static Material getGuiKickMsg() {
+		return guiKickMsg;
+	}
+	
+	public static Material getGuiCdDuration() {
+		return guiCdDuration;
+	}
+	
+	public static Material getGuiDelayStartKicks() {
+		return guiDelayStartKicks;
+	}
+	
+	public static Material getGuiKickDelayPlayer() {
+		return guiKickDelayPlayer;
+	}
+	
+	public static Material getGuiHelp() {
+		return guiHelp;
+	}
+	
+	public static Material getGuiStatus() {
+		return guiStatus;
+	}
+	
+	public static Material getGuiWlConfigList() {
+		return guiWlConfigList;
+	}
+	
+	public static Material getGuiAdd() {
+		return guiAdd;
+	}
+	
+	public static Material getGuiRemove() {
+		return guiRemove;
+	}
+	
+	public static Material getGuiAddAllOnline() {
+		return guiAddAllOnline;
+	}
+	
+	public static Material getGuiRemoveAll() {
+		return guiRemoveAll;
+	}
+	
+	public static Material getGuiSendPlayers() {
+		return guiSendPlayers;
+	}
+	
+	public static Material getGuiRestartServer() {
+		return guiRestartServer;
+	}
+	
+	public static Material getGuiAnvilItem() {
+		return guiAnvilItem;
+	}
 }
 
 
