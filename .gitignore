@@ -8,6 +8,7 @@ bin/
 .idea/*
 .idea/
 *.iml
+*.old
 .settings
 .settings/*
 .settings/
