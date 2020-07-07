@@ -1,15 +1,20 @@
 package com.gmail.shadoruncegaming.advancedwhitelist;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 
 public class WLStorage {
 	static AdvancedWhiteList m;
-	private static String configVersion;
+	private static String configVersion = "2.0";
 	private static ArrayList<String> whitelists = new ArrayList<String>(Arrays.asList("ExampleNameThatWouldHaveAccessIfConfigAccessIsOn_PleaseReplaceThis"));
 	private static boolean WhitelistEnabled = false;
 	private static boolean ProjectTeamAccessEnabled = false;
@@ -54,6 +59,19 @@ public class WLStorage {
         WLStorage.m = m;
     }
 
+	public static void versionCheck() {
+		m.reloadConfig();
+		FileConfiguration config = m.getConfig();
+		if (!(config.getString("config_version_dont_change").equals(configVersion))) {
+			Utility.sendConsole("§4Old Version detected");
+			convertConfig();
+		}
+		if ((config.getString("config_version_dont_change").equals(configVersion))) {
+			Utility.sendConsole("§1Config version matches");
+		}
+	}
+	
+	
 	public static void reload() {
 		try {
 			m.reloadConfig();
@@ -61,12 +79,12 @@ public class WLStorage {
 			m.setupConfig();
 			Utility.sendConsole("Something went wrong with config. Please recheck your configuration as the setting that went wrong was likely set back to default.");
 			m.reloadConfig();
+			e.printStackTrace();
 		}
 		FileConfiguration config = m.getConfig();
-		// TODO Implement auto convert from old version to new version. of config file.
 		try {
 			configVersion = config.getString("config_version_dont_change");
-		} catch(Exception e) {configVersion = "incorrect";}
+		} catch(Exception e) {Utility.sendConsole("Something was wrong with config version.");}
 		try {
 			whitelists = new ArrayList<String>(config.getStringList("whitelisted"));
 		} catch(Exception e) {whitelists = new ArrayList<String>(Arrays.asList("ExampleNameThatWouldHaveAccessIfConfigAccessIsOn_PleaseReplaceThis"));
@@ -182,10 +200,6 @@ public class WLStorage {
 		} catch(Exception e) {guiKickDelayPlayer = Material.CLOCK;
 		Utility.sendConsole("GUI item Kick Delay per Player was invalid, setting to default.");}
 		try {
-			guiHelp = Material.getMaterial(config.getString("gui.commands_row4.help").toUpperCase());
-		} catch(Exception e) {guiHelp = Material.BOOKSHELF;
-		Utility.sendConsole("GUI item Help was invalid, setting to default.");}
-		try {
 			guiStatus = Material.getMaterial(config.getString("gui.commands_row4.status").toUpperCase());
 		} catch(Exception e) {guiStatus = Material.BOOK;
 		Utility.sendConsole("GUI item Status was invalid, setting to default.");}
@@ -222,81 +236,179 @@ public class WLStorage {
 		} catch(Exception e) {guiRestartServer = Material.NAME_TAG;
 		Utility.sendConsole("GUI item Anvil Item was invalid, setting to default.");}
 		
-		Utility.sendConsole("&e&lAdvancedWhitelist > &7Config reloaded - In-game values matched to config.");
-		m.setupConfig();
+		Utility.sendConsole("&e&lAWL > &7Config reloaded - In-game values matched to config.");
+		WLCmd.getStatus(Bukkit.getConsoleSender());
 	}
-
+	
 	public static void convertConfig() {
 		m.reloadConfig();
 		FileConfiguration config = m.getConfig();
-		try {
-			WhitelistEnabled = config.getBoolean("whitelist_enabled");
-			config.set("whitelist_enabled", null);
-		} catch(Exception e) {}
-		try {
-			ConfigAccessEnabled = config.getBoolean("Config_Access");
-			config.set("Config_Access", null);
-		} catch(Exception e) {}
-		try {
-			ProjectTeamAccessEnabled = config.getBoolean("ProjectTeam_Access");
-			config.set("ProjectTeam_Access", null);
-		} catch(Exception e) {}
-		try {
-			StaffAccessEnabled = config.getBoolean("Staff_Access");
-			config.set("Staff_Access", null);
-		} catch(Exception e) {}
-		try {
-			TesterAccessEnabled = config.getBoolean("Tester_Access");
-			config.set("Tester_Access", null);
-		} catch(Exception e) {}
-		try {
-			AlternateAccessEnabled = config.getBoolean("Alternate_Access");
-			config.set("Alternate_Access", null);
-		} catch(Exception e) {}
-		try {
-			OtherAccessEnabled = config.getBoolean("Other_Access");
-			config.set("Other_Access", null);
-		} catch(Exception e) {}
-		try {
-			notwhitelistmsg = Utility.TransColor(config.getString("not_whitelisted_message"));
-			config.set("not_whitelisted_message", null);
-		} catch(Exception e) {}
-		try {
-			broadcastmsg = Utility.TransColor(config.getString("send_or_kick_broadcast_message"));
-			config.set("send_or_kick_broadcast_message", null);
-		} catch(Exception e) {}
-		try {
-			sendmsg = Utility.TransColor(config.getString("send_message"));
-			config.set("send_message", null);
-		} catch(Exception e) {}
-		try {
-			kickmsg = Utility.TransColor(config.getString("kick_message"));
-			config.set("kick_message", null);
-		} catch(Exception e) {}
-		try {
-			ServerCooldownDuration = config.getInt("server_cooldown_duration");
-			config.set("server_cooldown_duration", null);
-		} catch(Exception e) {}
-		try {
-			delayBeforeStartingKicks = config.getInt("delay_before_starting_kicks");
-			config.set("delay_before_starting_kicks", null);
-		} catch(Exception e) {}
-		try {
-			kickDelayPerPlayer = config.getInt("kick_delay_per_player");
-			config.set("kick_delay_per_player", null);
-		} catch(Exception e) {}
-		try {
-			ServerCooldownEnabled = config.getBoolean("server_cooldown");
-			config.set("server_cooldown", null);
-		} catch(Exception e) {}
-		try {
-			hubServer = Utility.TransColor(config.getString("server_to_send_to"));
-			config.set("server_to_send_to", null);
-		} catch(Exception e) {}
+		if (config.contains("config_version_dont_change")) {
+			try {
+				config.set("config_version_dont_change", configVersion);
+			} catch(Exception e) {e.printStackTrace();}
+		}
+		if (config.contains("whitelist_enabled")) {
+			try {
+				WhitelistEnabled = config.getBoolean("whitelist_enabled");
+				config.set("whitelist_enabled", null);
+			} catch(Exception e) {e.printStackTrace();}
+		}
+		if (config.contains("Config_Access")) {
+			try {
+				ConfigAccessEnabled = config.getBoolean("Config_Access");
+				config.set("Config_Access", null);
+			} catch(Exception e) {e.printStackTrace();}
+		}
+		if (config.contains("ProjectTeam_Access")) {
+			try {
+				ProjectTeamAccessEnabled = config.getBoolean("ProjectTeam_Access");
+				config.set("ProjectTeam_Access", null);
+			} catch(Exception e) {e.printStackTrace();}
+		}
+		if (config.contains("Staff_Access")) {
+			try {
+				StaffAccessEnabled = config.getBoolean("Staff_Access");
+				config.set("Staff_Access", null);
+			} catch(Exception e) {}
+		}
+		if (config.contains("Tester_Access")) {
+			try {
+				TesterAccessEnabled = config.getBoolean("Tester_Access");
+				config.set("Tester_Access", null);
+			} catch(Exception e) {}
+		}
+		if (config.contains("Alternate_Access")) {
+			try {
+				AlternateAccessEnabled = config.getBoolean("Alternate_Access");
+				config.set("Alternate_Access", null);
+			} catch(Exception e) {}
+		}
+		if (config.contains("Other_Access")) {
+			try {
+				OtherAccessEnabled = config.getBoolean("Other_Access");
+				config.set("Other_Access", null);
+			} catch(Exception e) {}
+		}
+		if (config.contains("not_whitelisted_message")) {
+			try {
+				notwhitelistmsg = Utility.TransColor(config.getString("not_whitelisted_message"));
+				config.set("not_whitelisted_message", null);
+			} catch(Exception e) {}
+		}
+		if (config.contains("send_or_kick_broadcast_message")) {
+			try {
+				broadcastmsg = Utility.TransColor(config.getString("send_or_kick_broadcast_message"));
+				config.set("send_or_kick_broadcast_message", null);
+			} catch(Exception e) {}
+		}
+		if (config.contains("send_message")) {
+			try {
+				sendmsg = Utility.TransColor(config.getString("send_message"));
+				config.set("send_message", null);
+			} catch(Exception e) {}
+		}
+		if (config.contains("kick_message")) {
+			try {
+				kickmsg = Utility.TransColor(config.getString("kick_message"));
+				config.set("kick_message", null);
+			} catch(Exception e) {}
+		}
+		if (config.contains("server_cooldown_duration")) {
+			try {
+				ServerCooldownDuration = config.getInt("server_cooldown_duration");
+				config.set("server_cooldown_duration", null);
+			} catch(Exception e) {}
+		}
+		if (config.contains("delay_before_starting_kicks")) {
+			try {
+				delayBeforeStartingKicks = config.getInt("delay_before_starting_kicks");
+				config.set("delay_before_starting_kicks", null);
+			} catch(Exception e) {}
+		}
+		if (config.contains("kick_delay_per_player")) {
+			try {
+				kickDelayPerPlayer = config.getInt("kick_delay_per_player");
+				config.set("kick_delay_per_player", null);
+			} catch(Exception e) {}
+		}
+		if (config.contains("server_cooldown")) {
+			try {
+				ServerCooldownEnabled = config.getBoolean("server_cooldown");
+				config.set("server_cooldown", null);
+			} catch(Exception e) {}
+		}
+		if (config.contains("server_to_send_to")) {
+			try {
+				hubServer = Utility.TransColor(config.getString("server_to_send_to"));
+				config.set("server_to_send_to", null);
+			} catch(Exception e) {}
+		}
 		saveWhitelists();
 		m.saveConfig();
-		Utility.sendConsole("&e&lAdvancedWhitelist > &7Config converted.");
+		Utility.sendConsole("&e&lAdvancedWhitelist > &7Config converted from old version.");
 	}
+
+
+	public static void convertMcConfig() {
+		m.reloadConfig();
+		FileConfiguration config = m.getConfig();
+		try {
+			if (Bukkit.hasWhitelist()) {
+				config.set("config.access_enabled.whitelist", Bukkit.hasWhitelist());
+				Bukkit.setWhitelist(false);
+			}
+			Utility.sendConsole("Minecraft Whitelist size: " + Bukkit.getWhitelistedPlayers().size());
+			if (Bukkit.getWhitelistedPlayers().size() > 0) {
+				for (OfflinePlayer player : Bukkit.getWhitelistedPlayers()) {
+					addWhitelist(player.getName());
+					Utility.sendConsole("§aAdded to whitelist from MC Whitelist: " + player.getName());
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void convertEWLConfig() {
+
+		File getFile = new File("plugins\\EasyWhiteList", "config.yml");
+		YamlConfiguration config = YamlConfiguration.loadConfiguration(getFile);
+		if (getFile.exists()) {
+			WhitelistEnabled = config.getBoolean("whitelist_enabled");
+			ConfigAccessEnabled = config.getBoolean("Config_Access");
+			ProjectTeamAccessEnabled = config.getBoolean("ProjectTeam_Access");
+			StaffAccessEnabled = config.getBoolean("Staff_Access");
+			TesterAccessEnabled = config.getBoolean("Tester_Access");
+			AlternateAccessEnabled = config.getBoolean("Alternate_Access");
+			OtherAccessEnabled = config.getBoolean("Other_Access");
+			notwhitelistmsg = Utility.TransColor(config.getString("not_whitelisted_message"));
+			broadcastmsg = Utility.TransColor(config.getString("send_or_kick_broadcast_message"));
+			sendmsg = Utility.TransColor(config.getString("send_message"));
+			kickmsg = Utility.TransColor(config.getString("kick_message"));
+			ServerCooldownDuration = config.getInt("server_cooldown_duration");
+			delayBeforeStartingKicks = config.getInt("delay_before_starting_kicks");
+			kickDelayPerPlayer = config.getInt("kick_delay_per_player");
+			ServerCooldownEnabled = config.getBoolean("server_cooldown");
+			hubServer = Utility.TransColor(config.getString("server_to_send_to"));
+			
+			saveWhitelists();
+			m.saveConfig();
+			try {
+				File renameFile = new File("plugins\\\\EasyWhiteList", "config.yml.old");
+				getFile.renameTo(renameFile);
+				getFile.deleteOnExit();
+				config.save(getFile);
+			} catch (IOException e) {
+				e.printStackTrace();
+				Utility.sendConsole("&e&lAdvancedWhitelist > &7EasyWhiteList Config not found.");
+			}
+			
+			Utility.sendConsole("&e&lAdvancedWhitelist > &7EasyWhiteList Config converted.");
+			}
+		if (!getFile.exists()) {Utility.sendConsole("&e&lAdvancedWhitelist > &7EasyWhiteList Config not found.");}
+	}
+	
 	
 	public static void saveWhitelists() {
 /*		File configFile = new File(this.m.getDataFolder(), "config.yml");
@@ -325,6 +437,25 @@ public class WLStorage {
 		c.set("config.misc.server_cooldown", isServerCooldown());
 		c.set("config.misc.server_to_send_to", getHubServer());
 		c.set("config.misc.allow_op_and_star_bypass", isOpBypass());
+		c.set("gui.enabled_row1.true", getGuiTrue().name());
+		c.set("gui.enabled_row1.false", getGuiFalse().name());
+		c.set("gui.messages_row2.lobby", getGuiLobby().name());
+		c.set("gui.messages_row2.not_whitelisted_message", getGuiNotWlMsg().name());
+		c.set("gui.messages_row2.send_or_kick_broadcast_message", getGuiBcMsg().name());
+		c.set("gui.messages_row2.send_message", getGuiSendMsg().name());
+		c.set("gui.messages_row2.kick_message", getGuiKickMsg().name());
+		c.set("gui.durations_row3.server_cooldown_duration", getGuiCdDuration().name());
+		c.set("gui.durations_row3.delay_before_starting_kicks", getGuiDelayStartKicks().name());
+		c.set("gui.durations_row3.kick_delay_per_player", getGuiKickDelayPlayer().name());
+		c.set("gui.commands_row4.status", getGuiStatus().name());
+		c.set("gui.commands_row4.whitelisted_config_list", getGuiWlConfigList().name());
+		c.set("gui.commands_row4.add", getGuiAdd().name());
+		c.set("gui.commands_row4.remove", getGuiRemove().name());
+		c.set("gui.commands_row4.add_all_online", getGuiAddAllOnline().name());
+		c.set("gui.commands_row4.remove_all", getGuiRemoveAll().name());
+		c.set("gui.commands_row4.send_players_enforce_whitelist", getGuiSendPlayers().name());
+		c.set("gui.commands_row4.restart_server", getGuiRestartServer().name());
+		c.set("gui.anvil_item", getGuiAnvilItem().name());
 		m.saveConfig();
 		//reload();
 	}

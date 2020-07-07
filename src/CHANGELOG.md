@@ -58,12 +58,25 @@
 - Cleaned Config file.
 - Added close GUI when clicking outside inv
 
+1.2.2:
+- Added Convert from EasyWhiteList and Minecraft Whitelist
+-- Added to right click for add gui item
+- Added auto convert for old config version of AdvancedWhiteList
+
+1.2.3:
+- Added UUID command to get UUID from Name or Name from UUID.
+- Added Check command to see what access a player may have.
+-- Offline through vault not working yet
+- Added Name GUI for current Whitelist and Currently Online
+- Fixed so clicked items can only be in the inv slots.
+
 Future Plans:
 - Add a summary, Put numbers instead of names for summary
-- Added proper Config version check at start so that it will rename the old file and enter a new one with existing values for easy transfer
 - Get Header comments to save into file.
-
+- Show empty inv for lower section
 
 Not likely to happen:
-- Added Anvil GUI to add names and type numbers for delay amounts.
+- Add Anvil GUI to add names and type numbers for delay amounts.
 -- Due to it requiring NMS at the moment as it's not Bukkit/Spigot implemented and it would need to be updated for each MC Version.
+
+

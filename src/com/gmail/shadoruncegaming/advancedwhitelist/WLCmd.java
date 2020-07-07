@@ -3,9 +3,13 @@ package com.gmail.shadoruncegaming.advancedwhitelist;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -17,9 +21,12 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.milkbowl.vault.permission.Permission;
 
 public class WLCmd implements CommandExecutor {
 	private static AdvancedWhiteList m;
+
+	static Permission perms = AdvancedWhiteList.getPermissions();
 	static String prefix = "&6&lA&e&lWL > &7";
 	static String names;
 
@@ -603,6 +610,7 @@ public class WLCmd implements CommandExecutor {
 				Utility.sendMsg(snd, prefix + "&fConfigAccess is &c&lOFF!&8");
 				Utility.sendMsg(snd, "&f=======================");
 				getStatus(snd);
+				
 				return;
 				
 			case "fullblock":
@@ -625,6 +633,7 @@ public class WLCmd implements CommandExecutor {
 				return;
 				
 			case "halfblock":
+			case "half":
 			case "staffonly":
 				WLStorage.setWhitelist(true);
 				WLStorage.setProjectTeamAccess(true);
@@ -650,21 +659,37 @@ public class WLCmd implements CommandExecutor {
 			case "restart":
 				restartServer(snd);
 				return;
-				
+
 			case "convert":
-				WLStorage.convertConfig();
-				return;
-				
-			/*
-			case "seeconfig":
-				ConfigurationSection config = WLStorage.m.getConfig().getConfigurationSection("config.access_enabled.teams");
-				Utility.sendMsg(snd, "Keys true:");
-				for (String s : config.getKeys(true)) {
-					Utility.sendMsg(snd, config.get(s).toString());
+				if (args.length == 1) {
+					Utility.sendMsg(snd, prefix + "§6Convert commands §7> §d/awl convert <type>"
+							+ "\n§dawl §f- §7Convert from an old config version of AdvancedWhiteList config file without version check"
+							+ "\n§dewl §f- §7Convert from EasyWhiteList config file."
+							+ "\n§dmc §f- §7Convert from Minecraft Whitelist. This will also set Mc Whitelist off, and add Whitelisted names to AWL list, but doesn't enable Config Access"
+							+ "\n§dversion §f §7Runs Version check and converts as needed. This is the same as server start.");
+					}
+				if (args.length > 1) {
+					if (args[1].equalsIgnoreCase("awl")) {WLStorage.convertConfig();}
+					if (args[1].equalsIgnoreCase("ewl")) {WLStorage.convertEWLConfig();}
+					if (args[1].equalsIgnoreCase("mc")) {WLStorage.convertMcConfig();}
+					if (args[1].equalsIgnoreCase("version")) {WLStorage.versionCheck();}
+					Utility.sendMsg(snd, "Conversion finished. Check console more additional messages.");
 				}
 				return;
-			 */
 				
+			case "uuid":
+				Utility.uuid(snd, args);
+				return;
+				
+			case "checkaccess":
+			case "checkplayer":
+			case "player":
+			case "check":
+			case "access":
+				accessCheck(snd,args);
+				return;
+				
+			case "awlgui":
 			case "wlgui":
 			case "gui":
 			default:
@@ -673,12 +698,126 @@ public class WLCmd implements CommandExecutor {
 					return;
 				}
 				else {
+					Utility.sendMsg(snd, "§cSorry, GUI is only for players.");
 					getStatus(snd);
 				}
 				return;
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
+	public static void accessCheck(CommandSender snd, String[] args) {
+		boolean playerOnline = false;
+		String core = "advancedwhitelist.bypass.";
+		ArrayList<Boolean> permsList = new ArrayList<Boolean>(Arrays.asList(false,false,false,false,false,false,false));
+		if (args.length == 1) {args[1] = snd.getName();}
+		if (args[1].length() == 36 && args[1].contains("-")) {
+			args[1] = Bukkit.getOfflinePlayer(UUID.fromString(args[1])).getName();
+		}
+		Utility.sendMsg(snd, prefix + " §6Access check for §d" + args[1] + "§6:");
+		// If Player Online:
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			if (player.getName().equalsIgnoreCase(args[1])) {
+				Utility.sendMsg(snd, "§d" + args[1] + " §6is online.");
+				playerOnline = true;
+				Utility.sendMsg(snd, "§6Whitelist enabled: " + Utility.getTFColor(WLStorage.isWhitelisting()) + 
+						"   §f|   §6Has access overall: " + Utility.getTFColor(WLEvent.permCheck(player)));
+				Utility.sendMsg(snd, "§6Config access enabled: " + Utility.getTFColor(WLStorage.isConfigAccess()) + 
+						"  §f|  §6On Config Whitelist: " + Utility.getTFColor(WLStorage.isWhitelisted(player.getName())));
+				Utility.sendMsg(snd, "§6OP and * perm bypass enabled: " + Utility.getInvertedTFColor(WLStorage.isOpBypass()) + 
+						"  §f|  §6OPed: " + Utility.getTFColor(player.isOp()));
+				Utility.sendMsg(snd, "§f--- §6Access and advancedwhitelist.bypass.<perm> check §f---");
+				// star "*", operator, projectteam, staff, tester, alternate, other
+				for (PermissionAttachmentInfo perm : player.getEffectivePermissions()) {
+					if (perm.getPermission().equalsIgnoreCase("*")) {
+						permsList.set(0, perm.getPermission().equalsIgnoreCase("*"));
+					}
+					if (perm.getPermission().equalsIgnoreCase(core + "operator")) {
+						permsList.set(1, perm.getPermission().equalsIgnoreCase(core + "operator"));
+					}
+					if (perm.getPermission().equalsIgnoreCase(core + "projectteam")) {
+						permsList.set(2, perm.getPermission().equalsIgnoreCase(core + "projectteam"));
+					}
+					if (perm.getPermission().equalsIgnoreCase(core + "staff")) {
+						permsList.set(3, perm.getPermission().equalsIgnoreCase(core + "staff"));
+					}
+					if (perm.getPermission().equalsIgnoreCase(core + "tester")) {
+						permsList.set(4, perm.getPermission().equalsIgnoreCase(core + "tester"));
+					}
+					if (perm.getPermission().equalsIgnoreCase(core + "alternate")) {
+						permsList.set(5, perm.getPermission().equalsIgnoreCase(core + "alternate"));
+					}
+					if (perm.getPermission().equalsIgnoreCase(core + "other")) {
+						permsList.set(6, perm.getPermission().equalsIgnoreCase(core + "other"));
+					}
+				} // End for loop
+				Utility.sendMsg(snd, "§6Has * Perm: " + Utility.getTFColor(permsList.get(0)) + 
+						"   §f|   §6Has .operator: " + Utility.getTFColor(permsList.get(1)));
+				Utility.sendMsg(snd, "§6ProjectTeam enabled: " + Utility.getTFColor(WLStorage.isProjectTeamAccess()) + 
+						"  §f|  §6Has .projectteam: " + Utility.getTFColor(permsList.get(2))); 
+				Utility.sendMsg(snd, "§6Staff enabled: " + Utility.getTFColor(WLStorage.isStaffAccess()) + 
+						"  §f|  §6Has .staff: " + Utility.getTFColor(permsList.get(3)));
+				Utility.sendMsg(snd, "§6Tester enabled: " + Utility.getTFColor(WLStorage.isTesterAccess()) + 
+						"  §f|  §6Has .tester: " + Utility.getTFColor(permsList.get(4)));
+				Utility.sendMsg(snd, "§6Alternate enabled: " + Utility.getTFColor(WLStorage.isAlternateAccess()) 
+				+ "  §f|  §6Has .alternate: " + Utility.getTFColor(permsList.get(5)));
+				Utility.sendMsg(snd, "§6Other enabled: " + Utility.getTFColor(WLStorage.isOtherAccess()) + 
+						"  §f|  §6Has .other: " + Utility.getTFColor(permsList.get(6)));
+			} // End if player online
+		}
+		// If Offline and has Vault
+		if (playerOnline == false) {
+			if (AdvancedWhiteList.hasVault()) {
+				Utility.sendMsg(snd, "§d" + args[1] + " §6is offline, using Vault to get permissions, which may not show correctly if player has * perm.");
+				perms = AdvancedWhiteList.getPermissions();
+				OfflinePlayer offlinePlayerUUID = Bukkit.getOfflinePlayer(args[1]); //UUID.fromString(args[1]); //Bukkit.getOfflinePlayer(args[1]).getUniqueId());
+				Bukkit.getScheduler().runTaskAsynchronously(m, new Runnable() {
+					@Override
+					public void run() {
+						String world = m.getServer().getWorlds().get(0).getName().toString();
+						permsList.set(0,perms.playerHas(world, offlinePlayerUUID, "*"));
+						permsList.set(1,perms.playerHas(world, offlinePlayerUUID, core + "operator"));
+						permsList.set(2,perms.playerHas(world, offlinePlayerUUID, core + "projectteam"));
+						permsList.set(3,perms.playerHas(world, offlinePlayerUUID, core + "staff"));
+						permsList.set(4,perms.playerHas(world, offlinePlayerUUID, core + "tester"));
+						permsList.set(5,perms.playerHas(world, offlinePlayerUUID, core + "alternate"));
+						permsList.set(6,perms.playerHas(world, offlinePlayerUUID, core + "other"));
+
+						Utility.sendMsg(snd, "§6Whitelist enabled: " + Utility.getTFColor(WLStorage.isWhitelisting()));
+						Utility.sendMsg(snd, "§6Config access enabled: " + Utility.getTFColor(WLStorage.isConfigAccess()) + 
+								"  §f|  §6On Config Whitelist: " + Utility.getTFColor(WLStorage.isWhitelisted(args[1])));
+						Utility.sendMsg(snd, "§6OP and * perm bypass enabled: " + Utility.getInvertedTFColor(WLStorage.isOpBypass()) + 
+								"  §f|  §6OPed: " + Utility.getTFColor(Bukkit.getOfflinePlayer(offlinePlayerUUID.getUniqueId()).isOp()));
+						Utility.sendMsg(snd, "§f--- §6Access and advancedwhitelist.bypass.<perm> check §f---");
+						Utility.sendMsg(snd, "§6Has * Perm: " + Utility.getTFColor(permsList.get(0)) + 
+								"   §f|   §6Has .operator: " + Utility.getTFColor(permsList.get(1)));
+						if (permsList.get(0)) Utility.sendMsg(snd, "§d" + args[1] + " §chas §e* §cperm, so other perms will show true. This does not properly reflect correctly for effective perms.");
+						Utility.sendMsg(snd, "§6ProjectTeam enabled: " + Utility.getTFColor(WLStorage.isProjectTeamAccess()) + 
+								"  §f|  §6Has .projectteam: " + Utility.getTFColor(permsList.get(2))); 
+						Utility.sendMsg(snd, "§6Staff enabled: " + Utility.getTFColor(WLStorage.isStaffAccess()) + 
+								"  §f|  §6Has .staff: " + Utility.getTFColor(permsList.get(3)));
+						Utility.sendMsg(snd, "§6Tester enabled: " + Utility.getTFColor(WLStorage.isTesterAccess()) + 
+								"  §f|  §6Has .tester: " + Utility.getTFColor(permsList.get(4)));
+						Utility.sendMsg(snd, "§6Alternate enabled: " + Utility.getTFColor(WLStorage.isAlternateAccess()) 
+						+ "  §f|  §6Has .alternate: " + Utility.getTFColor(permsList.get(5)));
+						Utility.sendMsg(snd, "§6Other enabled: " + Utility.getTFColor(WLStorage.isOtherAccess()) + 
+								"  §f|  §6Has .other: " + Utility.getTFColor(permsList.get(6)));
+					}});
+			} // End if hasVault
+			// If Offline and Doesn't have fault
+			if (!AdvancedWhiteList.hasVault()) {
+				Utility.sendMsg(snd, "§6Player is offline, and Vault isn't running on the server, "
+						+ "unable to get permissions of named player.");
+				Utility.sendMsg(snd, "§6Whitelist enabled: " + Utility.getTFColor(WLStorage.isWhitelisting()));
+				Utility.sendMsg(snd, "§6Config access enabled: " + Utility.getTFColor(WLStorage.isConfigAccess()) + 
+						"  §f|  §6On Config Whitelist: " + Utility.getTFColor(WLStorage.isWhitelisted(args[1])));
+				Utility.sendMsg(snd, "§6OP and * perm bypass enabled: " + Utility.getInvertedTFColor(WLStorage.isOpBypass()) + 
+						"  §f|  §6OPed: " + Utility.getTFColor(Bukkit.getOfflinePlayer(args[1]).isOp()));
+				getStatus(snd);
+			} // End if doesn't have vault
+		} // End if player offline
+	}
+
 	static void restartServer(CommandSender snd) {
 		Boolean currentWL = WLStorage.isWhitelisting();
 		Boolean currentCA = WLStorage.isConfigAccess();
@@ -864,6 +1003,7 @@ public class WLCmd implements CommandExecutor {
 		Utility.sendMsg(snd, "&e> &7/awl &bstatus 3 &7- &dDuration and Misc Settings");
 	}
 	
+	
 	static void getStatus(CommandSender snd) {
 		getStatusMenu(snd);
 		getStatus1(snd);
@@ -878,13 +1018,13 @@ public class WLCmd implements CommandExecutor {
 	
 	static void getStatus1(CommandSender snd) {
 		Utility.sendMsg(snd, "&e> &7========== Access Settings ==========");
-		Utility.sendMsg(snd, "&e> &7Whitelisting Enabled: &e" + WLGui.getTFColor(WLStorage.isWhitelisting()));
-		Utility.sendMsg(snd, "&e> &7Config Access Enabled: &e" + WLGui.getTFColor(WLStorage.isConfigAccess()));
-		Utility.sendMsg(snd, "&e> &7ProjectTeam Access Enabled: &e" + WLGui.getTFColor(WLStorage.isProjectTeamAccess()));
-		Utility.sendMsg(snd, "&e> &7Staff Access Enabled: &e" + WLGui.getTFColor(WLStorage.isStaffAccess()));
-		Utility.sendMsg(snd, "&e> &7Tester Access Enabled: &e" + WLGui.getTFColor(WLStorage.isTesterAccess()));
-		Utility.sendMsg(snd, "&e> &7Alternate Access Enabled: &e" + WLGui.getTFColor(WLStorage.isAlternateAccess()));
-		Utility.sendMsg(snd, "&e> &7Other Access Enabled: &e" + WLGui.getTFColor(WLStorage.isOtherAccess()));
+		Utility.sendMsg(snd, "&e> &7Whitelisting Enabled: &e" + Utility.getTFColor(WLStorage.isWhitelisting()));
+		Utility.sendMsg(snd, "&e> &7Config Access Enabled: &e" + Utility.getTFColor(WLStorage.isConfigAccess()));
+		Utility.sendMsg(snd, "&e> &7ProjectTeam Access Enabled: &e" + Utility.getTFColor(WLStorage.isProjectTeamAccess()));
+		Utility.sendMsg(snd, "&e> &7Staff Access Enabled: &e" + Utility.getTFColor(WLStorage.isStaffAccess()));
+		Utility.sendMsg(snd, "&e> &7Tester Access Enabled: &e" + Utility.getTFColor(WLStorage.isTesterAccess()));
+		Utility.sendMsg(snd, "&e> &7Alternate Access Enabled: &e" + Utility.getTFColor(WLStorage.isAlternateAccess()));
+		Utility.sendMsg(snd, "&e> &7Other Access Enabled: &e" + Utility.getTFColor(WLStorage.isOtherAccess()));
 	}
 	
 	static void getStatus2(CommandSender snd) {
@@ -906,7 +1046,7 @@ public class WLCmd implements CommandExecutor {
 		Utility.sendMsg(snd, "&e> &7========== Misc Settings ==========");
 		Utility.sendMsg(snd, "&e> &7Hub Server: &e" + WLStorage.getHubServer());
 		Utility.sendMsg(snd, "&e> &7Server Start to Player Login Cooldown Enabled: &e" + WLStorage.isServerCooldown());
-		Utility.sendMsg(snd, "&e> &7OP Bypass: &e" + WLGui.getInvertedTFColor(WLStorage.isOpBypass()));
+		Utility.sendMsg(snd, "&e> &7OP Bypass: &e" + Utility.getInvertedTFColor(WLStorage.isOpBypass()));
 	}
 	
 	static void HelpMenu(CommandSender snd) {
@@ -943,15 +1083,18 @@ public class WLCmd implements CommandExecutor {
 		Utility.sendMsg(snd, "&e> &7/awl &aadd&7/&cremove &f<name>");
 		Utility.sendMsg(snd, "&e> &7/awl &flist");
 		Utility.sendMsg(snd, "&e> &7/awl &a(addall)players &e- Add all current players to Config Access list");
-		Utility.sendMsg(snd, "&e> &7/awl &cclearlist");
+		Utility.sendMsg(snd, "&e> &7/awl &cclearlist §6- Remove all players from Config Access list");
 		Utility.sendMsg(snd, "&e> &7/awl &a&lon &f/ &coff");
 		Utility.sendMsg(snd, "&e> &7/awl &cwlonly/send/kick &e- Kicks players that aren't whitelisted.");
 		Utility.sendMsg(snd, "&e> &7/awl &creload");
 		Utility.sendMsg(snd, "&e> &7/awl &crestart &e- Kicks everyone except Operators and restarts the server.");
+		Utility.sendMsg(snd, "&e> &7/awl uuid (Name/UUID) &e- Get the UUID of any name, or name from any UUID");
+		Utility.sendMsg(snd, "&e> &7/awl check (Name/UUID) &e- Check which access a player has for bypasses.");
 		return;
 	}
 	static void getHelp2(CommandSender snd) {
-		Utility.sendMsg(snd, "&e> &7/awl &bscdon&7/&8scdoff &e- Server start to player login cooldown");
+		Utility.sendMsg(snd, "&e> &7/awl convert &e- Convert from Minecraft Whitelist, EasyWhiteList, and/or itself.");
+		Utility.sendMsg(snd, "&e> &7/awl scd &bon&7/&8off &e- Server start to player login cooldown");
 		Utility.sendMsg(snd, "&e> &7/awl &bscdtime <seconds>");
 		Utility.sendMsg(snd, "&e> &7/awl &bnotwlmsg <message> &e- Msg sent to the player if they aren't whitelisted for a server.");
 		Utility.sendMsg(snd, "&e> &7/awl &bbcastmsg <message> &e- Msg sent before everyone gets kicked from send/kick command.");
@@ -964,21 +1107,21 @@ public class WLCmd implements CommandExecutor {
 	}
 	static void getHelp3(CommandSender snd) {
 		Utility.sendMsg(snd, "&e> &7Access Commands: &aAdvancedWhiteList.Bypass.&b<Role>");
-		Utility.sendMsg(snd, "&e> Whitelist: &7/awl <wlon/on or wloff/off &f- &bOperators");
-		Utility.sendMsg(snd, "&e> ProjectTeamAccess: &7/awl <ptaon/ptaoff> &f- &bProjectTeam");
-		Utility.sendMsg(snd, "&e> StaffAccess: &7/awl <saon/saoff> &f- &bStaff");
-		Utility.sendMsg(snd, "&e> TesterAccess: &7/awl <taon/taoff> &f- &bTester");
-		Utility.sendMsg(snd, "&e> AlternateAccess: &7/awl <aaon/aaoff> &f- &bAlternateAccess");
-		Utility.sendMsg(snd, "&e> OtherAccess: &7/awl <oaon/oaoff> &f- &bOther");
-		Utility.sendMsg(snd, "&e> ConfigListAccess: &7/awl <caon/caoff>");
+		Utility.sendMsg(snd, "&e> Whitelist: &7/awl <wlon/on or wloff/off> &f- &bOperator");
+		Utility.sendMsg(snd, "&e> ProjectTeamAccess: &7/awl pta <on/off> &f- &bProjectTeam");
+		Utility.sendMsg(snd, "&e> StaffAccess: &7/awl staff <on/off> &f- &bStaff");
+		Utility.sendMsg(snd, "&e> TesterAccess: &7/awl tester <on/off> &f- &bTester");
+		Utility.sendMsg(snd, "&e> AlternateAccess: &7/awl alt <on/off> &f- &bAlternateAccess");
+		Utility.sendMsg(snd, "&e> OtherAccess: &7/awl other <on/off> &f- &bOther");
+		Utility.sendMsg(snd, "&e> ConfigListAccess: &7/awl config <on/off>");
 		Utility.sendMsg(snd, "&e> Lockdown: &7/awl <fullblock, block, full, lockdown, alloff>");
-		Utility.sendMsg(snd, "&e> Staff Only: &7/awl <halfblock, staffonly>");
+		Utility.sendMsg(snd, "&e> Staff Only: &7/awl <halfblock, half, staffonly>");
 		return;
 	}
 	static void getHelp4(CommandSender snd) {
 		Utility.sendMsg(snd, "&e> &7Permissions:");
 		Utility.sendMsg(snd, "&e> &7Command access: &6AdvancedWhiteList.Admin");
-		Utility.sendMsg(snd, "&e> &7Full Whitelist Bypass: &6AdvancedWhiteList.Bypass.&bOperators");
+		Utility.sendMsg(snd, "&e> &7Full Whitelist Bypass: &6AdvancedWhiteList.Bypass.&bOperator");
 		Utility.sendMsg(snd, "&e> &7ProjectTeam Access Bypass: &6AdvancedWhiteList.Bypass.&bProjectTeam");
 		Utility.sendMsg(snd, "&e> &7Staff Access Bypass: &6AdvancedWhiteList.Bypass.&bStaff");
 		Utility.sendMsg(snd, "&e> &7Tester Access Bypass: &6AdvancedWhiteList.Bypass.&bTester");
@@ -1000,13 +1143,9 @@ public class WLCmd implements CommandExecutor {
 	static void getHelp6(CommandSender snd) {
 		Utility.sendMsg(snd, "&e> addallplayers, addallplayer, allplayers, allplayer, addplayers, addall, aall");
 		Utility.sendMsg(snd, "&e> resetlist, reset, listreset, clearlist, listclear, removeall, rall");
-		Utility.sendMsg(snd, "&e> whitelist, wl");
-		Utility.sendMsg(snd, "&e> whiteliston, wlon, on");
-		Utility.sendMsg(snd, "&e> whitelistoff, fullblockoff, wloff, off, of");
-		Utility.sendMsg(snd, "&e> opbypass, bypass, op");
-		Utility.sendMsg(snd, "&e> servercooldown, scooldown, cooldown, servercd, scd, cd");
-		Utility.sendMsg(snd, "&e> servercooldownon, scooldownon, cooldownon, servercdon, scdon, cdon");
-		Utility.sendMsg(snd, "&e> servercooldownoff, scooldownoff, cooldownoff, servercdoff, scdoff, cdoff");
+		Utility.sendMsg(snd, "&e> whitelist, wl (on/off)");
+		Utility.sendMsg(snd, "&e> opbypass, bypass, op (on/off)");
+		Utility.sendMsg(snd, "&e> servercooldown, scooldown, cooldown, servercd, scd, cd (on/off)");
 		Utility.sendMsg(snd, "&e> servercooldowntime, scooldowntime, cooldowntime, servercdtime, scdtime, cdtime, scdt, cdt");
 		return;
 	}
@@ -1021,29 +1160,17 @@ public class WLCmd implements CommandExecutor {
 		return;
 	}
 	static void getHelp8(CommandSender snd) {
-		Utility.sendMsg(snd, "&e> projectteamaccess, projectteam, pta");
-		Utility.sendMsg(snd, "&e> projectteamon, projecton, teamon, ptaon, pon");
-		Utility.sendMsg(snd, "&e> projectteamoff, projectoff, teamoff, ptaoff, poff");
-		Utility.sendMsg(snd, "&e> staffaccess, sa");
-		Utility.sendMsg(snd, "&e> staffon, saon, son");
-		Utility.sendMsg(snd, "&e> staffoff, saoff, soff");
-		Utility.sendMsg(snd, "&e> testeraccess, ta");
-		Utility.sendMsg(snd, "&e> testeron, taon, ton");
-		Utility.sendMsg(snd, "&e> testeroff, taoff, toff");
+		Utility.sendMsg(snd, "&e> projectteamaccess, projectteam, pta (on/off)");
+		Utility.sendMsg(snd, "&e> staffaccess, staff, sa (on/off)");
+		Utility.sendMsg(snd, "&e> testeraccess, ta (on/off)");
 		return;
 	}
 	static void getHelp9(CommandSender snd) {
-		Utility.sendMsg(snd, "&e> alternateaccess, aa");
-		Utility.sendMsg(snd, "&e> alternateon, alteon, aaon, aon");
-		Utility.sendMsg(snd, "&e> alternateoff, altoff, aaoff, aoff");
-		Utility.sendMsg(snd, "&e> otheraccess, oa, oo");
-		Utility.sendMsg(snd, "&e> otheron, oaon, ooon, oon");
-		Utility.sendMsg(snd, "&e> otheroff, oaoff, oooff, ooff");
-		Utility.sendMsg(snd, "&e> configaccess, ca");
-		Utility.sendMsg(snd, "&e> configon, caon, con");
-		Utility.sendMsg(snd, "&e> configoff, caoff, coff");
+		Utility.sendMsg(snd, "&e> alternateaccess, aa (on/off)");
+		Utility.sendMsg(snd, "&e> otheraccess, other, oa, oo (on/off)");
+		Utility.sendMsg(snd, "&e> configaccess, config, ca (on/off)");
 		Utility.sendMsg(snd, "&e> fullblock, block, full, lockdown, alloff");
-		Utility.sendMsg(snd, "&e> halfblock, staffonly");
+		Utility.sendMsg(snd, "&e> halfblock, half, staffonly");
 		Utility.sendMsg(snd, "&e> kick, whitelistonly, wlonly, only, send, enforce");
 		return;
 	}

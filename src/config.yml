@@ -37,7 +37,7 @@
 # Note: All times are based on seconds.
 #
 # Don't change the Config Version
-config_version_dont_change: 1.1.4
+config_version_dont_change: "2.0"
 whitelisted:
 - "ExampleNameThatWouldHaveAccessIfConfigAccessIsOn_PleaseReplaceThis"
 config:

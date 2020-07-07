@@ -8,10 +8,13 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -147,28 +150,96 @@ public final class Utility {
 		}
 
 	}
+    
+    public static String numToString(Long in) {
+    	return in.toString();
+    }
+    
+    public static String numToString(int in) {
+    	Long l = (long) in;
+    	String s = l.toString();
+    	return s;
+    } 
+
+    public static Boolean invertBoolean(Boolean b) {
+    	if (b == true) return false;
+    	else return true;
+    }
+    
+	public static Material getGUITFMat(Boolean trueFalse) {
+		if (trueFalse) return WLStorage.getGuiTrue();
+		else return WLStorage.getGuiFalse();
+	}
+
+	public static String getTFColor(Boolean trueFalse) {
+		String TF = "error";
+		if (trueFalse) TF = "§aTrue";
+		if (!trueFalse) TF = "§cFalse";
+		return TF;
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static void uuid(CommandSender snd, String[] args) {
+		Utility.sendMsg(snd, "§6UUID Check by AWL:");
+		if (args.length == 1) {
+			Utility.sendMsg(snd, "§6Name given: §d" + Bukkit.getOfflinePlayer(args[1]).getName() + 
+					"   §6UUID: §d" + Bukkit.getOfflinePlayer(snd.getName()).getUniqueId().toString());
+		}
+		if (args.length > 1) {
+			if (args[1].length() == 36 && args[1].contains("-")) {
+				Utility.sendMsg(snd, "§6UUID Given: §d" +  args[1] + "   §6Name: §d" + 
+						Bukkit.getOfflinePlayer(UUID.fromString(args[1])).getName());
+				}
+			if (!(args[1].length() == 36) || !args[1].contains("-")) {
+				Utility.sendMsg(snd, "§6Name Given: §d" + Bukkit.getOfflinePlayer(args[1]).getName() + 
+						"   §6UUID: §d" + Bukkit.getOfflinePlayer(args[1]).getUniqueId().toString());
+				}
+//			Utility.sendMsg(snd, "Contains - : " + String.valueOf(args[1].contains("-")));
+//			Utility.sendMsg(snd, "Size: " + String.valueOf(args[1].length())+ 
+//					"\n Name: " + Bukkit.getOfflinePlayer(args[1]).getName() + 
+//					"\n UUID: " + Bukkit.getOfflinePlayer(args[1]).getUniqueId().toString());
+		}
+	}
+
+	public static String getInvertedTFColor(Boolean trueFalse) {
+		String TF = "error";
+		if (trueFalse) TF = "§cTrue";
+		if (!trueFalse) TF = "§aFalse";
+		return TF;
+	}
+    
+	public static long parseLongFromString(Player p, String arg) {
+		long num = 5;
+		try {
+			num = Long.getLong(arg);
+		} catch(Exception e) {
+			
+			Utility.sendConsole("String to long number conversion failed. Setting value to 5");
+		}
+		return num;
+	}
 
 	public static final void executeConsole(String cmd) {
 		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
 	}
 
-	public static final void sendMsg(Player b, String msg) {
+	public static final void sendMsg(Player p, String msg) {
 		if (msg.contains("%center%")) {
-			sendCenteredMessage(b, msg.replaceAll("%center%", ""));
+			sendCenteredMessage(p, msg.replaceAll("%center%", ""));
 		} else {
-			b.sendMessage(TransColor(msg));
+			p.sendMessage(TransColor(msg));
 		}
 	}
 
-	public static final void sendMsg(CommandSender b, String msg) {
+	public static final void sendMsg(CommandSender snd, String msg) {
 		if (msg.contains("%center%")) {
-			if (b instanceof Player) {
-				sendCenteredMessage((Player) b, msg.replaceAll("%center%", ""));
+			if (snd instanceof Player) {
+				sendCenteredMessage((Player) snd, msg.replaceAll("%center%", ""));
 			} else {
-				b.sendMessage(TransColor(msg.replaceAll("%center%", "")));
+				snd.sendMessage(TransColor(msg.replaceAll("%center%", "")));
 			}
 		} else {
-			b.sendMessage(TransColor(msg));
+			snd.sendMessage(TransColor(msg));
 		}
 	}
 

@@ -3,6 +3,9 @@ package com.gmail.shadoruncegaming.advancedwhitelist;
 //import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -47,10 +50,6 @@ public class WLEvent implements Listener {
 		}
 	}
 	
-	static void receiveMsg(String name) {
-		
-	}
-	
 	static boolean permCheck(Player p) {
 		if (WLStorage.isConfigAccess() == true && WLStorage.isWhitelisted(p.getName()))  return true;
 		boolean hasAwlPerm = false;
@@ -58,7 +57,7 @@ public class WLEvent implements Listener {
 		if (!WLStorage.isOpBypass()) {
 			if (p.isOp() || p.hasPermission("*")) {
 				for (PermissionAttachmentInfo perm : p.getEffectivePermissions()) {
-					if (perm.getPermission().equalsIgnoreCase("AdvancedWhiteList.Bypass.Operator") || perm.getPermission().equalsIgnoreCase("AdvancedWhiteList.Bypass.Operators")) {hasAwlPerm = true;}
+					if (perm.getPermission().equalsIgnoreCase("AdvancedWhiteList.Bypass.Operator")) {hasAwlPerm = true;}
 					if (WLStorage.isProjectTeamAccess() == true && perm.getPermission().equalsIgnoreCase("AdvancedWhiteList.Bypass.ProjectTeam")) {hasAwlPerm = true;}
 					if (WLStorage.isStaffAccess() == true && perm.getPermission().equalsIgnoreCase("AdvancedWhiteList.Bypass.Staff")) {hasAwlPerm = true;}
 					if (WLStorage.isTesterAccess() == true && perm.getPermission().equalsIgnoreCase("AdvancedWhiteList.Bypass.Tester")) {hasAwlPerm = true;}
@@ -71,7 +70,7 @@ public class WLEvent implements Listener {
 			}
 		}
 		else {
-			if (p.hasPermission("AdvancedWhiteList.Bypass.Operator") || p.hasPermission("AdvancedWhiteList.Bypass.Operators")) {hasAwlPerm = true;}
+			if (p.hasPermission("AdvancedWhiteList.Bypass.Operator")) {hasAwlPerm = true;}
 			if (WLStorage.isProjectTeamAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.ProjectTeam")) {hasAwlPerm = true;}
 			if (WLStorage.isStaffAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.Staff")) {hasAwlPerm = true;}
 			if (WLStorage.isTesterAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.Tester")) {hasAwlPerm = true;}
@@ -79,5 +78,19 @@ public class WLEvent implements Listener {
 			if (WLStorage.isOtherAccess() == true && p.hasPermission("AdvancedWhiteList.Bypass.Other")) {hasAwlPerm = true;}
 		}
 		return hasAwlPerm;
+	}
+	
+	@SuppressWarnings("deprecation")
+	static void checkPlayer(CommandSender snd, String name) {
+		OfflinePlayer p = Bukkit.getOfflinePlayer(name); // TODO try to get uuid then put into get offline player to avoid deprection
+		checkPlayer(snd,p);
+	}
+	
+	static void checkPlayer(CommandSender snd, OfflinePlayer p) {
+		Utility.sendMsg(snd,WLCmd.prefix);
+
+		if (Bukkit.getPluginManager().isPluginEnabled("Vault")) {
+			// TODO
+		}
 	}
 }
