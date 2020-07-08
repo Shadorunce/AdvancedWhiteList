@@ -44,7 +44,7 @@ public class AdvancedWhiteList extends JavaPlugin implements PluginMessageListen
 		if (!hasVault()) Utility.sendConsole("Vault isn't loaded, won't be able to get offline player permissions.");
 		//WLCmd.getStatus(Bukkit.getConsoleSender());
 		for (Player p : Bukkit.getOnlinePlayers()) {
-			if (p.hasPermission("advancedwhitelist.admin")) Utility.sendMsg(p, "§bAdvancedWhiteList has loaded or been reloaded!");
+			if (p.hasPermission("advancedwhitelist.admin")) Utility.sendMsg(p, "§bThe AdvancedWhiteList plugin has loaded or been reloaded!");
 		}
 		Utility.sendConsole("&6&lAdvanced&a&lWhitelist &7> Loaded!");
 	}
@@ -81,7 +81,7 @@ public class AdvancedWhiteList extends JavaPlugin implements PluginMessageListen
 
 	public void onDisable() {
 		for (Player p : Bukkit.getOnlinePlayers()) {
-			if (p.hasPermission("advancedwhitelist.admin")) Utility.sendMsg(p, "§cAdvancedWhiteList has been disabled!");
+			if (p.hasPermission("advancedwhitelist.admin")) Utility.sendMsg(p, "§cThe AdvancedWhiteList plugin has been disabled!");
 		}
 	}
 	

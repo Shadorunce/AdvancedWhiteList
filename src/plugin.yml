@@ -1,6 +1,6 @@
 name: AdvancedWhiteList
 version: 1.2.2
-api-version: 1.15
+api-version: 1.13
 author: Shadorunce
 prefix: AWL
 main: com.gmail.shadoruncegaming.advancedwhitelist.AdvancedWhiteList

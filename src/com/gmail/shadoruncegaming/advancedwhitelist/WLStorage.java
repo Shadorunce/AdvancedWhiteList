@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 
 
 public class WLStorage {
@@ -484,6 +485,9 @@ public class WLStorage {
 
 	public static void setWhitelist(Boolean onoff) {
 		WhitelistEnabled = onoff;
+		for (Player p : Bukkit.getOnlinePlayers()) {
+			if (p.hasPermission("advancedwhitelist.admin")) Utility.sendMsg(p, "§6The WhiteList from AWL has been " + Utility.getTFEnabled(onoff));
+		}
 		saveWhitelists();
 	}
 

@@ -70,6 +70,10 @@
 - Added Name GUI for current Whitelist and Currently Online
 - Fixed so clicked items can only be in the inv slots.
 
+1.2.4:
+- Added UUID and Check commands into GUI options
+- Fixed permission logins, previous added something I shouldn't have, but confirmed working now.
+
 Future Plans:
 - Add a summary, Put numbers instead of names for summary
 - Get Header comments to save into file.

@@ -689,6 +689,21 @@ public class WLCmd implements CommandExecutor {
 				accessCheck(snd,args);
 				return;
 				
+			case "listgui":
+			case "guilist":
+			case "players":
+			case "playerlist":
+			case "playergui":
+				if (snd instanceof Player) {
+					WLGui.playersGUI((Player) snd, 1);
+					return;
+				}
+				else {
+					Utility.sendMsg(snd, "§cSorry, GUI is only for players.");
+					getStatus(snd);
+				}
+				return;
+				
 			case "awlgui":
 			case "wlgui":
 			case "gui":

@@ -15,7 +15,6 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -139,14 +138,16 @@ public class WLGui implements Listener {
         // Commands
         	//status
         setStatusGuiItem(); // Slot 27 for the status
-        inv.setItem(28,createGuiItem(WLStorage.getGuiWlConfigList(), "§bShow Config Access List", 
-        		"§9Get the Config Access List in chat.", "§6Shift Left-Click for GUI of online and whitelisted players", "§dRight-Click to get Help Menu in chat", 
-        		"§dShift Right-Click to get Help command suggetion", cmdClick));
+        inv.setItem(28,createGuiItem(WLStorage.getGuiWlConfigList(), "§bConfig Access List or GUI", 
+        		"§9Left-Click to get the Config Access List in chat.", 
+        		"§6Shift Left-Click for GUI of online and whitelisted players", 
+        		"§dRight-Click to get Help Menu in chat", 
+        		"§dShift Right-Click to get Help command suggetion"));
         inv.setItem(29,createGuiItem(WLStorage.getGuiAdd(), ChatColor.DARK_GREEN + 
         		"Add player to Config Access List", "§dNeeds Config Access Enabled to ", 
         		"§d-- allow added players to connect.", cmdClick, "Right-click for convert whitelist command"));
         inv.setItem(30,createGuiItem(WLStorage.getGuiRemove(), ChatColor.DARK_RED + 
-        		"Remove player from Config Access List", cmdClick));
+        		"Remove player from Config Access List", cmdClick, "Right-click for Name/UUID check command"));
         inv.setItem(32,createGuiItem(WLStorage.getGuiAddAllOnline(), ChatColor.DARK_GREEN + 
         		"Add everyone to Config Access", "§dAdd everyone currently connected.", cmdClickConf));
         inv.setItem(33,createGuiItem(WLStorage.getGuiRemoveAll(), ChatColor.DARK_RED + 
@@ -201,20 +202,21 @@ public class WLGui implements Listener {
     			"§6Config Access Enabled: " + Utility.getTFColor(WLStorage.isConfigAccess()), 
     			"Left-Click to toggle Whitelist enabled", "Right-Click to toggle Config Access"));
     	inv.setItem(5, createGuiItem(Material.PAPER, "§eNext Page"));
-    	inv.setItem(8, createGuiItem(Material.BOOK, "§9Refresh List", "Click to refresh the list of heads/names."));
+    	inv.setItem(8, createGuiItem(Material.BOOKSHELF, "§9Refresh List", "Click to refresh the list of heads/names.", "Right-Click to get text whitelist."));
 
     	getPlayerHeads(currentPage);
     	ent.openInventory(inv);
     }
     
+	@SuppressWarnings("deprecation")
 	public static void getPlayerHeads(int page) {
-    	Bukkit.getScheduler().runTaskAsynchronously(m, new Runnable() {
-			@SuppressWarnings("deprecation")
-			@Override
-			public void run() {
+//    	Bukkit.getScheduler().runTaskAsynchronously(m, new Runnable() {
+//			@SuppressWarnings("deprecation")
+//			@Override
+//			public void run() {
 				// 45 per page
-				int headNum = ((page-1)*45); // used for where to start for which section of players.
-				
+				int headNum = ((page-1)*45); // used for where to start for which page of players.
+				// TODO
 				int i = 9; // used for start gui heads location
 				int in = 0; // Used for counting through players in each list.
 				
@@ -223,30 +225,32 @@ public class WLGui implements Listener {
 						inv.setItem(index,createGuiItem(Material.BLACK_STAINED_GLASS_PANE, " "));
 					}
 				}
-				
 				for (String player : WLStorage.getWhiteLists()) {
 					in++;
-					if ((i > 53) || in > (totalNames-1)) {
+					if ((i > 53)) {
 						Bukkit.getScheduler().cancelTasks(m);
 						break;
 					}
 					if (in < headNum) {
 						continue;
 					}
-					if (i <= 53 && in >= headNum && in <= (totalNames-1)) { // 9-53 of slots   then 63 for page 2    81 for page 3
-						inv.setItem(i, createGuiHead(Bukkit.getOfflinePlayer(player)));
+					if (i <= 53) { // 9-53 of slots   then 63 for page 2    81 for page 3
+						OfflinePlayer p = Bukkit.getOfflinePlayer(player);
+						inv.setItem(i, createGuiHead(Bukkit.getOfflinePlayer(player), p.isOnline()));
 						i++;
 					}
 				}
-				if (i <= 53 && in >= headNum && in <= (totalNames-1)) {
-					for (Player player : Bukkit.getOnlinePlayers()) {
-//						Utility.sendConsole("in: " + in + 
+				if (i <= 53) {
+					for (Player player : m.getServer().getOnlinePlayers()) {
+//						Utility.sendConsole("i: " + i +
+//								"\nin: " + in + 
+//								"\npage: " + page
+//								+ "\nheadNum: " + headNum +
 //								"\ntotalNames: " + totalNames + 
 //								"\nList Size: " + WLStorage.getWhiteLists().size() + 
 //								"\nOnline Player size: " + Bukkit.getOnlinePlayers().size());
 						in++;
-						if ((i > 53) || in > (totalNames-1)) {
-//							Utility.sendConsole("int > 53 or in > total check 3");
+						if ((i > 53)) {
 							Bukkit.getScheduler().cancelTasks(m);
 							break;
 						}
@@ -256,21 +260,24 @@ public class WLGui implements Listener {
 						if (WLStorage.isWhitelisted(player.getName())) {
 							continue;
 						}
-						if (i <= 53 && in >= headNum && in <= (totalNames-1) && !WLStorage.isWhitelisted(player.getName())) { // 9-53 of slots   then 63 for page 2    81 for page 3
-							inv.setItem(i, createGuiHead(player));
+						if (i <= 53 && !WLStorage.isWhitelisted(player.getName())) { // 9-53 of slots   then 63 for page 2    81 for page 3
+							inv.setItem(i, createGuiHead(player, player.isOnline()));
+							i++;
 						}
 					}
 				}
 				Bukkit.getScheduler().cancelTasks(m);
 				return;
-			}
-    	});
+//			}
+//    	});
     }
     
-    public static ItemStack createGuiHead(OfflinePlayer player) {
-    	ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1);
-    	SkullMeta meta = (SkullMeta) head.getItemMeta();
-    	meta.setOwningPlayer(player);
+    public static ItemStack createGuiHead(OfflinePlayer player, Boolean tf) {
+    	ItemStack head = new ItemStack(Material.PAPER, 1);
+    	if (!tf) {head = new ItemStack(Material.WRITABLE_BOOK, 1);}
+    	if (tf) {head = new ItemStack(Material.WRITTEN_BOOK, 1);}
+    	ItemMeta meta = head.getItemMeta(); //SkullMeta meta = (SkullMeta) head.getItemMeta();
+    	//meta.setOwningPlayer(player);
     	meta.setDisplayName(player.getName());
     	meta.setLore(Arrays.asList("§6Player Online: " + Utility.getTFColor(player.isOnline()),
     			"§6On Config Whitelist: " + Utility.getTFColor(WLStorage.isWhitelisted(player.getName())),
@@ -610,7 +617,7 @@ public class WLGui implements Listener {
 	    					}
 	    				}
 	    			}
-	    			if (name.contains("Show Config Access List")) {
+	    			if (name.contains("Config Access List or GUI")) {
 	    				if (e.isLeftClick()) {
 	    					if (!e.isShiftClick()) {
 		    					WLCmd.listPlayers(p);
@@ -652,6 +659,12 @@ public class WLGui implements Listener {
 	    	    					new ComponentBuilder("/awl remove <name>").create()));
 	    	    			msg.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/awl remove <name>"));
 	    	    			p.spigot().sendMessage(msg);
+	    				}
+	    				if (e.isRightClick()) {
+	    					msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, 
+	    							new ComponentBuilder("/awl uuid <Name/UUID>").create()));
+			    			msg.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/awl uuid <Name/UUID>"));
+			    			p.spigot().sendMessage(msg);
 	    				}
 	    			}
 	    			if (name.contains("Add everyone to Config Access")) if (e.isRightClick()) if (e.isShiftClick()) WLCmd.addAllPlayers();
@@ -744,7 +757,12 @@ public class WLGui implements Listener {
     					}
     				}
     				if (e.getRawSlot() == 8 && name.contains("Refresh List")) {
-    					getPlayerHeads(currentPage);
+    					if (e.isLeftClick()) {
+    						getPlayerHeads(currentPage);
+    					}
+    					if (e.isRightClick()) {
+    						WLCmd.listPlayers(p);
+    					}
 					}
     				if (e.getRawSlot() > 53) {return;}
     				if (e.getRawSlot() >= 9 && e.getRawSlot() <= 53) {
@@ -754,15 +772,16 @@ public class WLGui implements Listener {
         	    			return;
         	    		}
 						if (!name.equalsIgnoreCase("") && !name.equalsIgnoreCase(" ") && !Bukkit.getScheduler().toString().contains("advancedwhitelist.WLGui")) {
+							OfflinePlayer pl = Bukkit.getOfflinePlayer(name);
 		    	    		e.setCancelled(true);
 	    					if (WLStorage.isWhitelisted(name)) {
 	    						WLStorage.removeWhitelist(name);
-	        					inv.setItem(e.getRawSlot(), createGuiHead(Bukkit.getOfflinePlayer(name)));
+	        					inv.setItem(e.getRawSlot(), createGuiHead(Bukkit.getOfflinePlayer(name),pl.isOnline()));
 	        					return;
 	    					}
 	    					if (!WLStorage.isWhitelisted(name) ) {
 	    						WLStorage.addWhitelist(name);
-	        					inv.setItem(e.getRawSlot(), createGuiHead(Bukkit.getOfflinePlayer(name)));
+	        					inv.setItem(e.getRawSlot(), createGuiHead(Bukkit.getOfflinePlayer(name),pl.isOnline()));
 	        					return;
 	    					}
 						}

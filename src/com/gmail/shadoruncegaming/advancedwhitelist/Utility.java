@@ -172,10 +172,17 @@ public final class Utility {
 	}
 
 	public static String getTFColor(Boolean trueFalse) {
-		String TF = "error";
-		if (trueFalse) TF = "§aTrue";
-		if (!trueFalse) TF = "§cFalse";
-		return TF;
+		String tf = "error";
+		if (trueFalse) tf = "§aTrue";
+		if (!trueFalse) tf = "§cFalse";
+		return tf;
+	}
+	
+	public static String getTFEnabled(Boolean trueFalse) {
+		String tf = "error";
+		if (trueFalse) tf = "§aEnabled";
+		if (!trueFalse) tf = "§cDisabled";
+		return tf;
 	}
 	
 	@SuppressWarnings("deprecation")
