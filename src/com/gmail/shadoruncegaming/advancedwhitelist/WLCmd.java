@@ -15,6 +15,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
+import org.bukkit.plugin.messaging.PluginMessageRecipient;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -651,11 +652,18 @@ public class WLCmd implements CommandExecutor {
 			case "kick":
 			case "whitelistonly":
 			case "wlonly":
+			case "sendall":
 			case "only":
-			case "send":
 			case "enforce":
 				sendPlayers(snd);
 				return;
+				
+			case "send":
+			case "sendplayer":
+				sendPlayerToServer(snd,args);
+				return;
+				
+				
 			case "restart":
 				restartServer(snd);
 				return;
@@ -720,6 +728,44 @@ public class WLCmd implements CommandExecutor {
 		}
 	}
 	
+	private void sendPlayerToServer(CommandSender snd, String[] args) {
+		if (args.length < 3) {
+			snd.sendMessage("§cThe command is §6/awl send <player> <Bungeecord Server>");
+			return;
+		}
+		Player p = null;
+		String pname = args[1];
+		if (snd instanceof Player) {
+			p = (Player) snd;
+		}
+		if (!(snd instanceof Player)) {
+			p = Bukkit.getPlayer(pname);
+			if (p == null) {
+				for (Player player : Bukkit.getOnlinePlayers()) {
+					p = player;
+					break;
+				}
+			}
+		}
+		if (p == null) {
+			snd.sendMessage("There were no players on the server to use as a Bungee send messenger.");
+			return;
+		}
+		String otherServer = args[2];
+		ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        DataOutputStream out = new DataOutputStream(bout);
+		try {
+			out.writeUTF("ConnectOther");
+			out.writeUTF(pname);
+			out.writeUTF(otherServer);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		Utility.sendMsg(p, prefix + WLStorage.getSendMsg());
+		((PluginMessageRecipient) p).sendPluginMessage(m, "BungeeCord", bout.toByteArray());
+		return;
+	}
+
 	@SuppressWarnings("deprecation")
 	public static void accessCheck(CommandSender snd, String[] args) {
 		boolean playerOnline = false;
@@ -925,7 +971,7 @@ public class WLCmd implements CommandExecutor {
 			for(@SuppressWarnings("unused") Player player2 : Bukkit.getOnlinePlayers()) {
 				playersLeft++;
 			}
-			sendMsg(pname);
+			sendBungeeMsg(pname);
 		}
 		Utility.sendMsg(snd, prefix + "&e&lSend/Kick Results:");
 		Utility.sendMsg(snd, prefix + "&6Players on server: &f" + playersCount);
@@ -938,7 +984,7 @@ public class WLCmd implements CommandExecutor {
 
 	}
 	
-	static void sendMsg(String pname) {
+	static void sendBungeeMsg(String pname) {
 		ByteArrayOutputStream bout = new ByteArrayOutputStream();
         DataOutputStream out = new DataOutputStream(bout);
 		try {
@@ -1100,7 +1146,8 @@ public class WLCmd implements CommandExecutor {
 		Utility.sendMsg(snd, "&e> &7/awl &a(addall)players &e- Add all current players to Config Access list");
 		Utility.sendMsg(snd, "&e> &7/awl &cclearlist §6- Remove all players from Config Access list");
 		Utility.sendMsg(snd, "&e> &7/awl &a&lon &f/ &coff");
-		Utility.sendMsg(snd, "&e> &7/awl &cwlonly/send/kick &e- Kicks players that aren't whitelisted.");
+		Utility.sendMsg(snd, "&e> &7/awl &cwlonly/kick/sendall &e- Kicks players that aren't whitelisted.");
+		Utility.sendMsg(snd, "&e> &7/awl &6send <player> <Bungeecord Server> &e- Attempts to send the named player to the named Bungeecord server.");
 		Utility.sendMsg(snd, "&e> &7/awl &creload");
 		Utility.sendMsg(snd, "&e> &7/awl &crestart &e- Kicks everyone except Operators and restarts the server.");
 		Utility.sendMsg(snd, "&e> &7/awl uuid (Name/UUID) &e- Get the UUID of any name, or name from any UUID");

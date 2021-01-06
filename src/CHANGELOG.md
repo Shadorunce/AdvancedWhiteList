@@ -74,10 +74,17 @@
 - Added UUID and Check commands into GUI options
 - Fixed permission logins, previous added something I shouldn't have, but confirmed working now.
 
-Future Plans:
+1.2.5:
+- Removed send as a command to send all non-whitelisted players back to lobby/kick them
+- Added send command to new feature to send a player to a specified Bungeecord server.
+
+Future Plans not in any specific order:
 - Add a summary, Put numbers instead of names for summary
 - Get Header comments to save into file.
-- Show empty inv for lower section
+- Show empty inv for lower section. Without NMS, would need to save inv to file, clear it, give what I want them to have, and when done, give it back. Would only do this for using Anvil inv to run add/remove/etc commands to put a tag or something similar.
+- Connect to Bungee to be able to change all servers from one location .. might need to do from Database connection.
+- Notify permission that will send a message to those with permission when someone not whitelisted tries to join the server, and includes what the attempted joining player does have permissions for.
+- Add permissions for different functions to add more customizable access, and add permission to be able to check access even though it doesn't change anything.
 
 Not likely to happen:
 - Add Anvil GUI to add names and type numbers for delay amounts.
